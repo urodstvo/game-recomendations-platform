@@ -1,0 +1,196 @@
+{% extends 'game_app/base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block css %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link type='text/css' rel="stylesheet" href="{% static 'game_app/css/general.css' %}" />
+    <title>LAB6</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawLINE1);
+      google.charts.setOnLoadCallback(drawLINE2);
+      google.charts.setOnLoadCallback(drawLINE3);
+
+     function drawLINE1() {
+        var data = google.visualization.arrayToDataTable([
+          ['Месяц', 'Кол-во игр'],{% for key, value in line.items %}
+          [{{key}}, {{ value.0 }}],{% endfor %}]);
+
+        var options = {
+          title: 'График динамики выхода игр за {{ year }} год',
+          curveType: 'function',
+          legend: { position: 'bottom' },
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('line1'));
+
+        chart.draw(data, options);
+      }
+
+      function drawLINE2() {
+        var data = google.visualization.arrayToDataTable([
+          ['Месяц', 'Кол-во пользователей'],{% for key, value in users.items %}
+          ["{{key}}", {{ value }}],{% endfor %}
+        ]);
+
+        var options = {
+          title: 'График динамики регистраций новых пользователей за последние 12 месяцев',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('line2'));
+
+        chart.draw(data, options);
+      }
+
+
+      function drawLINE3() {
+        var data = google.visualization.arrayToDataTable([
+          ['Месяц', 'Кол-во игр'],{% for key, value in games.items %}
+          ["{{key}}", {{ value }}],{% endfor %}
+        ]);
+
+        var options = {
+          title: 'График динамики активности добавления игр в личные библиотеки за последние 12 месяцев',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('line3'));
+
+        chart.draw(data, options);
+      }
+
+
+    </script>
+{% endblock %}
+{% block main %}
+    <style>
+        main
+        {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            flex-direction: column;
+        }
+
+        main div
+        {
+            margin-bottom: 40px;
+        }
+
+        table
+        {
+            width: 100%;
+            text-align: center;
+            border-color: orange;
+        }
+
+        .inner td
+        {
+            width: 50%;
+        }
+
+        td
+        {
+            border: 1px solid orange;
+        }
+
+        td:has( > table)
+        {
+            border: none;
+        }
+
+        .main
+        {
+            border: 1px solid orange;
+            margin: 20px 0;
+            background-color: #222;
+        }
+
+
+    </style>
+<main>
+    <div style="width: 100%;">
+            Статистические показатели динамики выхода игр в {{ year }} году.
+            <table class="main">
+        <tr>
+            <td>t</td>
+            <td>y, шт</td>
+            <td>
+                <table class="inner">
+                    <tr>Абсолютный прирост, шт</tr>
+                    <tr><td>Цепной</td><td>Базисный</td></tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr>Темп роста, %</tr>
+                    <tr><td>Цепной</td><td>Базисный</td></tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr>Темп прироста, %</tr>
+                    <tr><td>Цепной</td><td>Базисный</td></tr>
+                </table>
+            </td>
+        </tr>
+        {% for key, value in table.items %}
+        <tr>
+            <td>{{ key }}</td>
+            <td> {{ value.0 }} </td>
+            <td>
+                <table class="inner">
+                    <tr><td>{{ value.1 }}</td><td>{{ value.2 }}</td></tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr><td>{{ value.3 }}</td><td>{{ value.4 }}</td></tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr><td>{{ value.5 }}</td><td>{{ value.6 }}</td></tr>
+                </table>
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+    </div>
+
+    <div>
+        <div id="line1" style="width: 1500px; height: 600px;"></div>
+        При сравнении с графика предыдущих лет, прослеживается внешняя схожесть.
+        <br>
+        Почти ежегодно пики по повторяются в осенний сезон, в добавок иногда, и в зимний сезон.
+        <br>
+        Это зачастую из-за летнего отдыха и весенних праздников.
+        <br>
+        Характер сезонных колебаний более сходится к аддитивному.
+    </div>
+    <div>
+        <div id="line2" style="width: 1500px; height: 600px;"></div>
+        На графике нет отчетливого сезонного колебания. Они скорее носят случайный характер.
+        <br>
+        Пик встречается в начале лета, причиной чего скорее всего начало летнего отдыха.
+        <br>
+        А также держится осенью, что может быть связано с частым выходом в этом сезоне новинок.
+    </div>
+    <div>
+        <div id="line3" style="width: 1500px; height: 600px;"></div>
+        На графике нет отчетливого сезонного колебания.
+        <br>
+        Колебания скорее носят случайный характер.
+        <br>
+        Пик встречается в начале зимы, в остальное время прослеживается неизменяющийся тренд.
+    </div>
+</main>
+{% endblock %}
+{% block js %}
+{% endblock %}

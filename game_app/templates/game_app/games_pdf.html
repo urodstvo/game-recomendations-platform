@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Сводка по доступности и ценам игр</h1>
+    <table class="stylized games-table">
+        <tr>
+            <td>Название</td>
+            <td>Платформа</td>
+            <td>Цена</td>
+        </tr>
+        {% for game, price in table.items %}
+            <tr>
+               <td>{{ game.name }}</td>
+                <td>
+                {% for platform in game.platforms.all %}
+                    <br>{{ platform }}
+                {% endfor %}
+                </td>
+                <td>{{ price }}</td>
+            </tr>
+        {% endfor %}
+        <tr class="revieved">
+            <td>Всего: </td>
+            <td></td>
+            <td>{{ sum }} руб.</td>
+        </tr>
+
+    </table>
+</body>
+</html>

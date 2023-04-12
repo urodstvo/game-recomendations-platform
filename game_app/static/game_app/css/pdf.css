@@ -1,0 +1,118 @@
+h1
+{
+    text-align: center;
+    color: darkorange;
+}
+
+.avatar
+{
+    height: 128px;
+    object-fit: cover;
+}
+
+.container div
+{
+        display: inline-block;
+}
+
+.container div span
+{
+    color: orange;
+    font-size: 2rem;
+}
+
+.container
+{
+    padding: 10px;
+    background-color: #333;
+    color: #DDD;
+}
+
+.short-info td
+{
+    width: 400px;
+}
+
+.short-info tr:nth-of-type(2)
+{
+    color: red;
+    font-size: 1rem;
+}
+
+.platforms, .rates
+{
+       display: inline-block;
+       width: 49%;
+}
+
+.rates  td
+{
+     width: 100px;
+     color: white;
+     font-weight: bold;
+     font-size: 1rem;
+}
+
+.platforms  td
+{
+     width: 200px;
+     color: white;
+     font-weight: bold;
+     font-size: 1rem;
+}
+
+.rates  td:last-of-type
+{
+    width: 500px;
+}
+
+table
+{
+  border-spacing: 0px;
+  border-collapse: collapse;
+  border: 1px solid black;
+}
+.stylized td
+{
+    border: 1px solid black;
+}
+
+.stylized tr:nth-of-type(2n)
+{
+    background-color: orange;
+}
+
+.stylized tr:nth-of-type(2n) td
+{
+    color: #111;
+}
+
+.stylized tr:first-of-type
+{
+    background-color: darkorange;
+}
+
+.games
+{
+    text-align: center;
+}
+
+.games img
+{
+    height: 210px;
+}
+
+.games-table
+{
+    width: 100%;
+}
+
+.revieved
+{
+    background-color: lime;
+}
+
+.search-pdf
+{
+    left: -50px;
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Профиль {{ user.username }}</h1>
+    <div class="container">
+        <img class="avatar" src="http://127.0.0.1:8000{{ user.profile.avatar.url }}">
+        <div>
+            <span>{{ user.profile.nickname }}</span>
+            <br>
+            Зарегистрирован: {{ user.date_joined }}
+        </div>
+    </div>
+    <div class="container">
+        <div class="short-info">
+        <h2>Краткая сводка</h2>
+        <table>
+            <tr>
+                <td>Игр в библиотеке:</td>
+                <td>Написано отзывов:</td>
+                <td>Оценено игр:</td>
+            </tr>
+            <tr>
+                <td>{{ game_count }}</td>
+                <td>{{ review_count }}</td>
+                <td>{{ rate_count }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="platforms">
+        <h2>Распределение платформ</h2>
+        <table class="stylized">
+            <tr>
+                <td>Платформа:</td>
+                <td>Кол-во игр</td>
+            </tr>
+            {% for platform, count in ratio.items %}
+            {% if count > 0 %}
+            <tr>
+                <td> {{ platform }} </td>
+                <td> {{ count }} </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="rates">
+        <h2>Распределение оценок</h2>
+        <table class="stylized">
+            <tr>
+                <td>Оценка:</td>
+                <td>Кол-во:</td>
+                <td>Игры:</td>
+            </tr>
+            {% for rate in rates %}
+            {% if rate.count > 0 %}
+            <tr>
+                <td> {{ rate.rate }} </td>
+                <td> {{ rate.count }} </td>
+                <td>
+                    {% for game in rate.games %}
+                        {{ game.game.name }}<br>
+                    {% endfor %}
+                </td>
+
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    </div>
+
+    <div class="games">
+        <h2>Библиотека игр</h2>
+
+        {% for game in library %}
+        <img src="https://images.igdb.com/igdb/image/upload/t_1080p/{{ game.game.cover }}.jpg">
+        {% endfor %}
+    </div>
+</body>
+</html>

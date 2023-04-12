@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Отчет добавленных в библиотеку игр по месяцам для {{ user }} с {{ start }} до {{ end }}</h1>
+    <table class="stylized games-table">
+        <tr>
+            <td>Год</td>
+            <td>Месяц</td>
+            <td>Игры</td>
+            <td>Кол-во</td>
+        </tr>
+            {% for record in data %}
+        <tr>
+            {% for key, value in record.items %}
+                {% if key != 'games' %}
+                <td>{{ value }}</td>
+                {% else %}
+                <td>
+                    {% for game in value %}
+                        {{ game }}<br>
+                    {% endfor %}
+                </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        <tr class="revieved">
+            <td>Всего:</td>
+            <td></td>
+            <td></td>
+            <td>{{ total }}</td>
+        </tr>
+    </table>
+</body>
+</html>
