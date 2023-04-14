@@ -9,13 +9,16 @@
     <script>
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawLINE1);
+      google.charts.setOnLoadCallback(drawLINE11);
       google.charts.setOnLoadCallback(drawLINE2);
+      google.charts.setOnLoadCallback(drawLINE22);
       google.charts.setOnLoadCallback(drawLINE3);
+      google.charts.setOnLoadCallback(drawLINE33);
 
      function drawLINE1() {
         var data = google.visualization.arrayToDataTable([
           ['Месяц', 'Кол-во игр','l=3','l=5','l=7'],{% for key, value in table1.items %}
-          [{{key}}, {{ value.0 }}, {% if not value.1 == "-" %} {{ value.1 }} {% else %} null{% endif %},{% if not value.3 == "-" %} {{ value.3 }}{% else %} null{% endif %}, {% if not value.2 == "-" %} {{ value.2 }} {% else %} null{% endif %}],{% endfor %}]);
+         {% if not key == 13 %}[{{key}}, {{ value.0 }} , {% if not key == 1 and not key == 12 %} {{ value.1 }} {% else %} null{% endif %},{% if not key == 1 and not key == 2 and not key == 3 and not key == 10 and not key == 11 and not key == 12 %} {{ value.3 }}{% else %} null{% endif %}, {% if not key == 1 and not key == 2 and not key == 11 and not key == 12 %} {{ value.2 }} {% else %} null{% endif %}],{% endif %}{% endfor %}]);
 
         var options = {
           title: 'График динамики выхода игр за {{ year }} год',
@@ -28,11 +31,28 @@
         chart.draw(data, options);
       }
 
+      function drawLINE11() {
+        var data = google.visualization.arrayToDataTable([
+          ['Месяц', 'Кол-во игр','l=3','l=5','l=7'],{% for key, value in table1.items %}
+          {% if not key == 13 %}[{{key}}, {{ value.0 }} , {{ value.1 }} ,{{ value.3 }}, {{ value.2 }}],{% endif %}{% endfor %}]);
+
+        var options = {
+          title: 'График динамики выхода игр за {{ year }} год',
+          curveType: 'function',
+          legend: { position: 'bottom' },
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('line1.1'));
+
+        chart.draw(data, options);
+      }
+
       function drawLINE2() {
         var data = google.visualization.arrayToDataTable([
           ['Месяц', 'Кол-во игр','l=3','l=5','l=7'],{% for key, value in table2.items %}
-          [{{key}}, {{ value.0 }}, {% if not value.1 == "-" %} {{ value.1 }} {% else %} null{% endif %},{% if not value.3 == "-" %} {{ value.3 }}{% else %} null{% endif %}, {% if not value.2 == "-" %} {{ value.2 }} {% else %} null{% endif %}],{% endfor %}]);
-        var options = {
+         {% if not key == 13 %}[{{key}}, {{ value.0 }} , {% if not key == 1 and not key == 12 %} {{ value.1 }} {% else %} null{% endif %},{% if not key == 1 and not key == 2 and not key == 3 and not key == 10 and not key == 11 and not key == 12 %} {{ value.3 }}{% else %} null{% endif %}, {% if not key == 1 and not key == 2 and not key == 11 and not key == 12 %} {{ value.2 }} {% else %} null{% endif %}],{% endif %}{% endfor %}]);
+
+         var options = {
           title: 'График динамики регистраций новых пользователей за последние 12 месяцев',
           curveType: 'function',
           legend: { position: 'bottom' }
@@ -43,12 +63,28 @@
         chart.draw(data, options);
       }
 
+      function drawLINE22() {
+        var data = google.visualization.arrayToDataTable([
+          ['Месяц', 'Кол-во игр','l=3','l=5','l=7'],{% for key, value in table2.items %}
+          {% if not key == 13 %}[{{key}}, {{ value.0 }} , {{ value.1 }} ,{{ value.3 }}, {{ value.2 }}],{% endif %}{% endfor %}]);
+
+        var options = {
+          title: 'График динамики выхода игр за {{ year }} год',
+          curveType: 'function',
+          legend: { position: 'bottom' },
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('line2.2'));
+
+        chart.draw(data, options);
+      }
+
 
       function drawLINE3() {
         var data = google.visualization.arrayToDataTable([
           ['Месяц', 'Кол-во игр','l=3','l=5','l=7'],{% for key, value in table3.items %}
-          [{{key}}, {{ value.0 }}, {% if not value.1 == "-" %} {{ value.1 }} {% else %} null{% endif %},{% if not value.3 == "-" %} {{ value.3 }}{% else %} null{% endif %}, {% if not value.2 == "-" %} {{ value.2 }} {% else %} null{% endif %}],{% endfor %}]);
-        var options = {
+          {% if not key == 13 %}[{{key}}, {{ value.0 }} , {% if not key == 1 and not key == 12 %} {{ value.1 }} {% else %} null{% endif %},{% if not key == 1 and not key == 2 and not key == 3 and not key == 10 and not key == 11 and not key == 12 %} {{ value.3 }}{% else %} null{% endif %}, {% if not key == 1 and not key == 2 and not key == 11 and not key == 12 %} {{ value.2 }} {% else %} null{% endif %}],{% endif %}{% endfor %}]);
+            var options = {
           title: 'График динамики активности добавления игр в личные библиотеки за последние 12 месяцев',
           curveType: 'function',
           legend: { position: 'bottom' }
@@ -59,11 +95,31 @@
         chart.draw(data, options);
       }
 
+      function drawLINE33() {
+        var data = google.visualization.arrayToDataTable([
+          ['Месяц', 'Кол-во игр','l=3','l=5','l=7'],{% for key, value in table3.items %}
+          {% if not key == 13 %}[{{key}}, {{ value.0 }} , {{ value.1 }} ,{{ value.3 }}, {{ value.2 }}],{% endif %}{% endfor %}]);
+
+        var options = {
+          title: 'График динамики выхода игр за {{ year }} год',
+          curveType: 'function',
+          legend: { position: 'bottom' },
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('line3.3'));
+
+        chart.draw(data, options);
+      }
+
 
     </script>
 {% endblock %}
 {% block main %}
     <style>
+        .retrieve
+        {
+            background-color: orange;
+        }
         main
         {
             display: flex;
@@ -112,7 +168,7 @@
 <main>
     <div>
         <div style="width: 100%;">
-        <table class="main">
+            <table class="main">
         <tr>
             <td>t</td>
             <td>y, шт</td>
@@ -130,9 +186,48 @@
             </td>
         </tr>
         {% for key, value in table1.items %}
+                {% if not key == 13 %}
         <tr>
             <td>{{ key }}</td>
             <td> {{ value.0 }} </td>
+            <td>
+                <table class="inner">
+                    <tr>
+                        <td {% if key == 1 or key == 12 %} class="retrieve" {% endif %}>{{ value.1 }}</td>
+                        <td {% if key == 1 or key == 2 or key == 3 or key == 10 or key == 11 or key == 12 %} class="retrieve" {% endif %}>{{ value.2 }}</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr><td {% if key == 1 or key == 2 or key == 11 or key == 12  %} class="retrieve" {% endif %}>{{ value.3 }}</td></tr>
+                </table>
+            </td>
+        </tr>
+                {% endif %}
+        {% endfor %}
+
+    </table>
+        </div>
+        <div style="width: 100%;">
+            <table class="main">
+        <tr>
+            <td>
+                <table class="inner">
+                    <tr>Скользящие средние на след. период</tr>
+                    <tr><td>l=3</td><td>l=7</td></tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr>Взвешенная скользящая средняя на след. период</tr>
+                    <tr><td>l=5</td></tr>
+                </table>
+            </td>
+        </tr>
+        {% for key, value in table1.items %}
+        {% if key == 13 %}
+        <tr>
             <td>
                 <table class="inner">
                     <tr><td>{{ value.1 }}</td><td>{{ value.2 }}</td></tr>
@@ -144,11 +239,13 @@
                 </table>
             </td>
         </tr>
+        {% endif %}
         {% endfor %}
 
     </table>
-    </div>
+        </div>
         <div id="line1" style="width: 1500px; height: 600px;"></div>
+        <div id="line1.1" style="width: 1500px; height: 600px;"></div>
     </div>
     <div>
         <div style="width: 100%;">
@@ -170,9 +267,48 @@
             </td>
         </tr>
         {% for key, value in table2.items %}
+             {% if not key == 13 %}
         <tr>
             <td>{{ key }}</td>
             <td> {{ value.0 }} </td>
+            <td>
+                <table class="inner">
+                    <tr>
+                        <td {% if key == 1 or key == 12 %} class="retrieve" {% endif %}>{{ value.1 }}</td>
+                        <td {% if key == 1 or key == 2 or key == 3 or key == 10 or key == 11 or key == 12 %} class="retrieve" {% endif %}>{{ value.2 }}</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr><td {% if key == 1 or key == 2 or key == 11 or key == 12  %} class="retrieve" {% endif %}>{{ value.3 }}</td></tr>
+                </table>
+            </td>
+        </tr>
+                {% endif %}
+        {% endfor %}
+
+    </table>
+    </div>
+        <div style="width: 100%;">
+            <table class="main">
+        <tr>
+            <td>
+                <table class="inner">
+                    <tr>Скользящие средние</tr>
+                    <tr><td>l=3</td><td>l=7</td></tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr>Взвешенная скользящая средняя</tr>
+                    <tr><td>l=5</td></tr>
+                </table>
+            </td>
+        </tr>
+        {% for key, value in table2.items %}
+        {% if key == 13 %}
+        <tr>
             <td>
                 <table class="inner">
                     <tr><td>{{ value.1 }}</td><td>{{ value.2 }}</td></tr>
@@ -184,11 +320,13 @@
                 </table>
             </td>
         </tr>
+        {% endif %}
         {% endfor %}
 
     </table>
-    </div>
+        </div>
         <div id="line2" style="width: 1500px; height: 600px;"></div>
+        <div id="line2.2" style="width: 1500px; height: 600px;"></div>
     </div>
     <div>
         <div style="width: 100%;">
@@ -210,9 +348,48 @@
             </td>
         </tr>
         {% for key, value in table3.items %}
+             {% if not key == 13 %}
         <tr>
             <td>{{ key }}</td>
             <td> {{ value.0 }} </td>
+            <td>
+                <table class="inner">
+                    <tr>
+                        <td {% if key == 1 or key == 12 %} class="retrieve" {% endif %}>{{ value.1 }}</td>
+                        <td {% if key == 1 or key == 2 or key == 3 or key == 10 or key == 11 or key == 12 %} class="retrieve" {% endif %}>{{ value.2 }}</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr><td {% if key == 1 or key == 2 or key == 11 or key == 12  %} class="retrieve" {% endif %}>{{ value.3 }}</td></tr>
+                </table>
+            </td>
+        </tr>
+                {% endif %}
+        {% endfor %}
+
+    </table>
+    </div>
+        <div style="width: 100%;">
+            <table class="main">
+        <tr>
+            <td>
+                <table class="inner">
+                    <tr>Скользящие средние</tr>
+                    <tr><td>l=3</td><td>l=7</td></tr>
+                </table>
+            </td>
+            <td>
+                <table class="inner">
+                    <tr>Взвешенная скользящая средняя</tr>
+                    <tr><td>l=5</td></tr>
+                </table>
+            </td>
+        </tr>
+        {% for key, value in table3.items %}
+        {% if key == 13 %}
+        <tr>
             <td>
                 <table class="inner">
                     <tr><td>{{ value.1 }}</td><td>{{ value.2 }}</td></tr>
@@ -223,13 +400,14 @@
                     <tr><td>{{ value.3 }}</td></tr>
                 </table>
             </td>
-
         </tr>
+        {% endif %}
         {% endfor %}
 
     </table>
-    </div>
+        </div>
         <div id="line3" style="width: 1500px; height: 600px;"></div>
+        <div id="line3.3" style="width: 1500px; height: 600px;"></div>
     </div>
 </main>
 {% endblock %}

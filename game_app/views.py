@@ -923,19 +923,10 @@ class SmoothRyadView(View):
                     case 11: table1[m].append(math.ceil((line[8] * (-5) + line[9] * 6 + line[10] * 12 + line[11] * 13 + (-9) * line[12]) / 35))
                     case 12: table1[m].append(math.ceil((line[8] * 3 + line[9] * (-5) + line[10] * (-3) + line[11] * 9 + 31 * line[12]) / 35))
 
-        # for m in range(1, 13):
-        #     if not 3 < m < 10:
-        #         table1[m][2] = math.ceil(FindEdgeFor5(m - 4 if m < 3 else m - 9,
-        #                                               [table1[i][2] for i in range(4, 9)] if m < 5 else
-        #                                               [table1[i][2] for i in range(5, 10)]))
-        #     if not 1 < m < 12:
-        #         table1[m][1] = math.ceil(FindEdgeFor5(m - 2 if m < 3 else m - 11,
-        #                                               [table1[i][1] for i in range(2, 7)] if m < 5 else
-        #                                               [table1[i][1] for i in range(7, 12)]))
-        #     if not 2 < m < 11:
-        #         table1[m][3] = math.ceil(FindEdgeFor5(m - 3 if m < 3 else m - 10,
-        #                                               [table1[i][3] for i in range(3, 8)] if m < 5 else
-        #                                               [table1[i][3] for i in range(6, 11)]))
+        table1[13] = ['-',
+                      math.ceil(table1[10][0] + ((line[12] - line[11]) / 3)),
+                      math.ceil(table1[10][1] + ((line[12] - line[11]) / 7)),
+                      math.ceil(table1[10][2] + ((line[12] - line[11]) / 5))]
 
         users = {}
         start = datetime.now() - relativedelta(years=1)
@@ -958,8 +949,7 @@ class SmoothRyadView(View):
                         table2[m].append(math.ceil((users[10] * 5 + users[11] * 2 + users[12] * (-1)) / 6))
 
             if 3 < m < 10:
-                table2[m].append(math.ceil(
-                    (users[m - 3] + users[m - 2] + users[m - 1] + users[m] + users[m + 1] + users[m + 2] + users[m + 3]) / 7))
+                table2[m].append(math.ceil((users[m - 3] + users[m - 2] + users[m - 1] + users[m] + users[m + 1] + users[m + 2] + users[m + 3]) / 7))
             else:
                 match m:
                     case 1:
@@ -982,8 +972,7 @@ class SmoothRyadView(View):
                             10] * 1 + users[11] * 4 + 39 * users[12]) / 42))
 
             if 2 < m < 11:
-                table2[m].append(math.ceil((users[m - 2] * (-3) + users[m - 1] * 12 + users[m] * 17 + users[m + 1] * 12 + (
-                    -3) * users[m + 2]) / 35))
+                table2[m].append(math.ceil((users[m - 2] * (-3) + users[m - 1] * 12 + users[m] * 17 + users[m + 1] * 12 + (-3) * users[m + 2]) / 35))
             else:
                 match m:
                     case 1:
@@ -999,22 +988,11 @@ class SmoothRyadView(View):
                         table2[m].append(math.ceil(
                             (users[8] * 3 + users[9] * (-5) + users[10] * (-3) + users[11] * 9 + 31 * users[12]) / 35))
 
-        # for m in range(1, 13):
-        #     if not 3 < m < 10:
-        #         value = math.ceil(FindEdgeFor5(m - 4 if m < 3 else m - 9,
-        #                                        [table2[i][2] for i in range(4, 9)] if m < 5 else
-        #                                        [table2[i][2] for i in range(5, 10)]))
-        #         table2[m][2] = value if value > 0 else 0
-        #     if not 1 < m < 12:
-        #         value = math.ceil(FindEdgeFor5(m - 2 if m < 3 else m - 11,
-        #                                        [table2[i][1] for i in range(2, 7)] if m < 5 else
-        #                                        [table2[i][1] for i in range(7, 12)]))
-        #         table2[m][1] = value if value > 0 else 0
-        #     if not 2 < m < 11:
-        #         value = math.ceil(FindEdgeFor5(m - 3 if m < 3 else m - 10,
-        #                                        [table2[i][3] for i in range(3, 8)] if m < 5 else
-        #                                        [table2[i][3] for i in range(6, 11)]))
-        #         table2[m][3] = value if value > 0 else 0
+        table2[13] = ['-',
+                      math.ceil(table2[10][0]+((users[12]-users[11])/3)),
+                      math.ceil(table2[10][1]+((users[12]-users[11])/7)),
+                      math.ceil(table2[10][2]+((users[12]-users[11])/5))]
+
 
         games = {}
         start = datetime.now() - relativedelta(years=1)
@@ -1037,9 +1015,7 @@ class SmoothRyadView(View):
                         table3[m].append(math.ceil((games[10] * 5 + games[11] * 2 + games[12] * (-1)) / 6))
 
             if 3 < m < 10:
-                table3[m].append(math.ceil(
-                    (games[m - 3] + games[m - 2] + games[m - 1] + games[m] + games[m + 1] + games[m + 2] + games[
-                        m + 3]) / 7))
+                table3[m].append(math.ceil((games[m - 3] + games[m - 2] + games[m - 1] + games[m] + games[m + 1] + games[m + 2] + games[m + 3]) / 7))
             else:
                 match m:
                     case 1:
@@ -1066,9 +1042,7 @@ class SmoothRyadView(View):
                                 10] * 1 + games[11] * 4 + 39 * games[12]) / 42))
 
             if 2 < m < 11:
-                table3[m].append(
-                    math.ceil((games[m - 2] * (-3) + games[m - 1] * 12 + games[m] * 17 + games[m + 1] * 12 + (
-                        -3) * games[m + 2]) / 35))
+                table3[m].append(math.ceil((games[m - 2] * (-3) + games[m - 1] * 12 + games[m] * 17 + games[m + 1] * 12 + (-3) * games[m + 2]) / 35))
             else:
                 match m:
                     case 1:
@@ -1085,22 +1059,10 @@ class SmoothRyadView(View):
                         table3[m].append(math.ceil(
                             (games[8] * 3 + games[9] * (-5) + games[10] * (-3) + games[11] * 9 + 31 * games[12]) / 35))
 
-        # for m in range(1, 13):
-        #     if not 3 < m < 10:
-        #         value = math.ceil(FindEdgeFor5(m - 4 if m < 3 else m - 9,
-        #                                        [table3[i][2] for i in range(4, 9)] if m < 5 else
-        #                                        [table3[i][2] for i in range(5, 10)]))
-        #         table3[m][2] = value if value > 0 else 0
-        #     if not 1 < m < 12:
-        #         value = math.ceil(FindEdgeFor5(m - 2 if m < 3 else m - 11,
-        #                                        [table3[i][1] for i in range(2, 7)] if m < 5 else
-        #                                        [table3[i][1] for i in range(7, 12)]))
-        #         table3[m][1] = value if value > 0 else 0
-        #     if not 2 < m < 11:
-        #         value = math.ceil(FindEdgeFor5(m - 3 if m < 3 else m - 10,
-        #                                        [table3[i][3] for i in range(3, 8)] if m < 5 else
-        #                                        [table3[i][3] for i in range(6, 11)]))
-        #         table3[m][3] = value if value > 0 else 0
+        table3[13] = ['-',
+                      math.ceil(table3[10][0]+((games[12]-games[11])/3)),
+                      math.ceil(table3[10][1]+((games[12]-games[11])/7)),
+                      math.ceil(table3[10][2]+((games[12]-games[11])/5))]
 
         context = {'year': year,
                    'user': user.username,
