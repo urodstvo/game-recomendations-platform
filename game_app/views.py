@@ -2,7 +2,7 @@ import os
 import random
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
-from typing import Any
+from typing import Any, Dict
 import locale
 
 locale.setlocale(locale.LC_ALL, "ru_RU")  # russian
@@ -807,9 +807,10 @@ class RyadView(View):
         start = date(int(year), 1, 1)
         line = {}
         table = {1: ['-', '-', '-', '-', '-', '-', '-']}
-        for m in range(1, 12*1+1):
+        for m in range(1, 12 * 1 + 1):
             line[m] = [len(
-                list(Game.objects.filter(release_date__lt=start + relativedelta(months=1), release_date__gte=start))), start.year]
+                list(Game.objects.filter(release_date__lt=start + relativedelta(months=1), release_date__gte=start))),
+                start.year]
             start += relativedelta(months=1)
             # if m > 1:
             #     table[m] = [line[m][0], round(line[m][0] - line[m - 1][0], 2), round(line[m][0] - line[1][0], 2),
@@ -825,16 +826,17 @@ class RyadView(View):
                 list(Game.objects.filter(release_date__lt=start + relativedelta(months=1), release_date__gte=start))))
             start += relativedelta(months=1)
             if m > 0:
-                table[m+1] = [lens[m], round(lens[m] - lens[m - 1], 2), round(lens[m] - lens[0], 2),
-                            round(lens[m] / lens[m - 1] * 100, 2),
-                            round(lens[m] / lens[0] * 100, 2), round(lens[m] / lens[m - 1] * 100 - 100, 2),
-                            round(lens[m] / lens[0] * 100 - 100, 2)]
+                table[m + 1] = [lens[m], round(lens[m] - lens[m - 1], 2), round(lens[m] - lens[0], 2),
+                                round(lens[m] / lens[m - 1] * 100, 2),
+                                round(lens[m] / lens[0] * 100, 2), round(lens[m] / lens[m - 1] * 100 - 100, 2),
+                                round(lens[m] / lens[0] * 100 - 100, 2)]
             else:
-                table[m+1][0] = lens[m]
+                table[m + 1][0] = lens[m]
         users = {}
         start = datetime.now() - relativedelta(years=1)
         for m in range(1, 13):
-            users[start.strftime('%B')] = len(list(User.objects.filter(date_joined__gte=start, date_joined__lt=start+relativedelta(months=1))))
+            users[start.strftime('%B')] = len(
+                list(User.objects.filter(date_joined__gte=start, date_joined__lt=start + relativedelta(months=1))))
             start += relativedelta(months=1)
 
         games = {}
@@ -858,7 +860,8 @@ def CreateUser(request):
     num = random.randint(0, 100)
     for _ in range(0, 16):
         try:
-            library = Library.objects.create(user=User.objects.get(pk=random.randint(0, 100)), game=Game.objects.get(pk=random.randint(0, 40456)))
+            library = Library.objects.create(user=User.objects.get(pk=random.randint(0, 100)),
+                                             game=Game.objects.get(pk=random.randint(0, 40456)))
             month = random.randint(6, 16)
             d = date(2022, month, 1) if month < 13 else date(2023, month - 12, 1)
             library.added_at = d
@@ -867,3 +870,124 @@ def CreateUser(request):
         else:
             library.save()
     return HttpResponse(f'added ')
+
+
+class SmoothRyadView(View):
+    def get(self, request):
+        def FindEdgeFor5(pos, arr):
+            # arr = list(map(lambda x: float(x), arr))
+            # print(pos, arr)
+            return (arr[0] * (-3) + arr[1] * 12 + arr[2] * 17 + arr[3] * 12 + arr[0] * (-3)) / 35 + \
+                   (arr[0] * (-2) + arr[1] * (-1) + arr[3] * 1 + arr[4] * 2) * pos / 10 + \
+                   (arr[0] * 2 + arr[1] * (-1) + arr[2] * (-2) + arr[3] * (-1) + arr[0] * 2) * pos * pos / 14
+
+        user = request.GET.get('user', request.user.username)
+        user = User.objects.get(username=user)
+        year = request.GET.get('year', (datetime.now() - relativedelta(years=1)).year)
+        start = date(int(year), 1, 1)
+        line = {}
+        table1 = {}
+        for m in range(1, 13):
+            line[m] = len(
+                list(Game.objects.filter(release_date__lt=start + relativedelta(months=1), release_date__gte=start)))
+            start += relativedelta(months=1)
+
+        start = date(2022, 1, 1)
+        for m in range(1, 13):
+            table1[m] = []
+            table1[m].append(line[m])
+            table1[m].append(math.ceil((line[m - 1] + line[m] + line[m + 1]) / 3) if 1 < m < 12 else '-')
+            table1[m].append(math.ceil((line[m - 3] + line[m - 2] + line[m - 1] + line[m] +
+                                        line[m + 1] + line[m + 2] + line[m + 3]) / 7) if 3 < m < 10 else '-')
+
+            table1[m].append(math.ceil((line[m - 2] * (-3) + line[m - 1] * 12 + line[m] * 17 +
+                                        line[m + 1] * 12 + (-3) * line[m + 2]) / 35) if 2 < m < 11 else '-')
+
+        for m in range(1, 13):
+            if not 3 < m < 10:
+                table1[m][2] = math.ceil(FindEdgeFor5(m - 4 if m < 3 else m - 9,
+                                                      [table1[i][2] for i in range(4, 9)] if m < 5 else
+                                                      [table1[i][2] for i in range(5, 10)]))
+            if not 1 < m < 12:
+                table1[m][1] = math.ceil(FindEdgeFor5(m - 2 if m < 3 else m - 11,
+                                                      [table1[i][1] for i in range(2, 7)] if m < 5 else
+                                                      [table1[i][1] for i in range(7, 12)]))
+            if not 2 < m < 11:
+                table1[m][3] = math.ceil(FindEdgeFor5(m - 3 if m < 3 else m - 10,
+                                                      [table1[i][3] for i in range(3, 8)] if m < 5 else
+                                                      [table1[i][3] for i in range(6, 11)]))
+
+        users = {}
+        start = datetime.now() - relativedelta(years=1)
+        table2 = {}
+        for m in range(1, 13):
+            users[m] = len(
+                list(User.objects.filter(date_joined__gte=start, date_joined__lt=start + relativedelta(months=1))))
+            start += relativedelta(months=1)
+
+        for m in range(1, 13):
+            table2[m] = []
+            table2[m].append(users[m])
+            table2[m].append(math.ceil((users[m - 1] + users[m] + users[m + 1]) / 3) if 1 < m < 12 else '-')
+            table2[m].append(math.ceil((users[m - 3] + users[m - 2] + users[m - 1] + users[m] +
+                                        users[m + 1] + users[m + 2] + users[m + 3]) / 7) if 3 < m < 10 else '-')
+            table2[m].append(math.ceil((users[m - 2] + users[m - 1] + users[m] +
+                                        users[m + 1] + users[m + 2]) / 5) if 2 < m < 11 else '-')
+        for m in range(1, 13):
+            if not 3 < m < 10:
+                value = math.ceil(FindEdgeFor5(m - 4 if m < 3 else m - 9,
+                                               [table2[i][2] for i in range(4, 9)] if m < 5 else
+                                               [table2[i][2] for i in range(5, 10)]))
+                table2[m][2] = value if value > 0 else 0
+            if not 1 < m < 12:
+                value = math.ceil(FindEdgeFor5(m - 2 if m < 3 else m - 11,
+                                               [table2[i][1] for i in range(2, 7)] if m < 5 else
+                                               [table2[i][1] for i in range(7, 12)]))
+                table2[m][1] = value if value > 0 else 0
+            if not 2 < m < 11:
+                value = math.ceil(FindEdgeFor5(m - 3 if m < 3 else m - 10,
+                                               [table2[i][3] for i in range(3, 8)] if m < 5 else
+                                               [table2[i][3] for i in range(6, 11)]))
+                table2[m][3] = value if value > 0 else 0
+
+        games = {}
+        start = datetime.now() - relativedelta(years=1)
+        table3 = {}
+        for m in range(1, 13):
+            games[m] = len(
+                list(Library.objects.filter(added_at__gte=start, added_at__lt=start + relativedelta(months=1))))
+            start += relativedelta(months=1)
+
+        for m in range(1, 13):
+            table3[m] = []
+            table3[m].append(games[m])
+            table3[m].append(math.ceil((games[m - 1] + games[m] + games[m + 1]) / 3) if 1 < m < 12 else '-')
+            table3[m].append(math.ceil((games[m - 3] + games[m - 2] + games[m - 1] + games[m] +
+                                        games[m + 1] + games[m + 2] + games[m + 3]) / 7) if 3 < m < 10 else '-')
+            table3[m].append(math.ceil((games[m - 2] + games[m - 1] + games[m] +
+                                        games[m + 1] + games[m + 2]) / 5) if 2 < m < 11 else '-')
+
+        for m in range(1, 13):
+            if not 3 < m < 10:
+                value = math.ceil(FindEdgeFor5(m - 4 if m < 3 else m - 9,
+                                               [table3[i][2] for i in range(4, 9)] if m < 5 else
+                                               [table3[i][2] for i in range(5, 10)]))
+                table3[m][2] = value if value > 0 else 0
+            if not 1 < m < 12:
+                value = math.ceil(FindEdgeFor5(m - 2 if m < 3 else m - 11,
+                                               [table3[i][1] for i in range(2, 7)] if m < 5 else
+                                               [table3[i][1] for i in range(7, 12)]))
+                table3[m][1] = value if value > 0 else 0
+            if not 2 < m < 11:
+                value = math.ceil(FindEdgeFor5(m - 3 if m < 3 else m - 10,
+                                               [table3[i][3] for i in range(3, 8)] if m < 5 else
+                                               [table3[i][3] for i in range(6, 11)]))
+                table3[m][3] = value if value > 0 else 0
+
+        context = {'year': year,
+                   'user': user.username,
+                   'table1': table1,
+                   'table2': table2,
+                   'table3': table3,
+                   }
+        return render(request, 'game_app/lab7.html', context)

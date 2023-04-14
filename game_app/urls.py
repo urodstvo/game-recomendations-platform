@@ -20,6 +20,8 @@ urlpatterns = [
     path('pdf/library/', libraryPDF, name='library-pdf'),
     path('charts/lab5/', ChartView.as_view(), name='charts'),
     path('charts/lab6/', RyadView.as_view(), name='ryad'),
-    path('create/user/', CreateUser, name='create-user')
+    path('create/user/', CreateUser, name='create-user'),
+    path('charts/lab7/', SmoothRyadView.as_view(), name='lab7'),
+
 
 ]
