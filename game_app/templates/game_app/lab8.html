@@ -139,6 +139,38 @@
                 <td>
                     t
                 </td>
+                {% for key, value in table11.items %}
+                    <td>{{ key }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    Yt
+                </td>
+                {% for key, value in table11.items %}
+                     <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+        Количество серий = {{ n11 }}
+        <br>
+        Длина самой длинной серии = {{ max11 }}
+        <br>
+        Медиана = {{ me1 }}
+        <br>
+        Проверка по притерию серий:
+        <br>
+        {{ n11 }} > {{ result1 }}
+        <br>
+        {{ max11 }} < {{ tautau }}
+        <br>
+        В итоге: {% if result11 %} Гипотеза об отсутствии тренда принимается {% else %} Гипотеза об отсутствии тренда отвергается {% endif %}
+        <br><br>
+        <table class="main">
+            <tr>
+                <td>
+                    t
+                </td>
                 {% for key, value in table1.items %}
                     <td>{{ key }}</td>
                 {% endfor %}
@@ -156,14 +188,6 @@
         <br>
         Длина самой длинной серии = {{ max1 }}
         <br>
-        Проверка по притерию серий:
-        <br>
-        {{ n1 }} > {{ result1 }}
-        <br>
-        {{ max1 }} < {{ tautau }}
-        <br>
-        В итоге: {% if result11 %} Гипотеза об отсутствии тренда принимается {% else %} Гипотеза об отсутствии тренда отвергается {% endif %}
-        <br><br>
         Проверка по притерию "восходящих и нисходящих":
         <br>
         {{ n1 }} > {{ result2 }}
@@ -198,9 +222,9 @@
             </tr>
             {% endfor %}
         </table>
-        line = {{ line1 }} <br>
-        parabola = {{ parabola1 }} <br>
-        pokazatelnaya = {{ pokaz1 }}
+        Линейная модель = {{ line1 }} <br>
+        Параболическая модель = {{ parabola1 }} <br>
+        Показательная модель = {{ pokaz1 }}
         <br><br>
         <div id="line1" style="width: 1500px; height: 600px;"></div>
     </div>
@@ -228,6 +252,38 @@
                 <td>
                     t
                 </td>
+                {% for key, value in table21.items %}
+                    <td>{{ key }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    Yt
+                </td>
+                {% for key, value in table21.items %}
+                     <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+        Количество серий = {{ n21 }}
+        <br>
+        Длина самой длинной серии = {{ max21 }}
+        <br>
+        Медиана = {{ me2 }}
+        <br>
+        Проверка по притерию серий:
+        <br>
+        {{ n21 }} > {{ result1 }}
+        <br>
+        {{ max21 }} < {{ tautau }}
+        <br>
+        В итоге: {% if result21 %} Гипотеза об отсутствии тренда принимается {% else %} Гипотеза об отсутствии тренда отвергается {% endif %}
+        <br><br>
+        <table class="main">
+            <tr>
+                <td>
+                    t
+                </td>
                 {% for key, value in table2.items %}
                     <td>{{ key }}</td>
                 {% endfor %}
@@ -245,14 +301,6 @@
         <br>
         Длина самой длинной серии = {{ max2 }}
         <br>
-        Проверка по притерию серий:
-        <br>
-        {{ n2 }} > {{ result1 }}
-        <br>
-        {{ max2 }} < {{ tautau }}
-        <br>
-        В итоге: {% if result21 %} Гипотеза об отсутствии тренда принимается {% else %} Гипотеза об отсутствии тренда отвергается {% endif %}
-        <br><br>
         Проверка по притерию "восходящих и нисходящих":
         <br>
         {{ n2 }} > {{ result2 }}
@@ -288,9 +336,9 @@
             </tr>
             {% endfor %}
         </table>
-        line = {{ line2 }} <br>
-        parabola = {{ parabola2 }} <br>
-        pokazatelnaya = {{ pokaz2 }}
+        Линейная модель = {{ line1 }} <br>
+        Параболическая модель = {{ parabola1 }} <br>
+        Показательная модель = {{ pokaz1 }}
         <br><br>
     </div>
     <div>
@@ -317,6 +365,38 @@
                 <td>
                     t
                 </td>
+                {% for key, value in table31.items %}
+                    <td>{{ key }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    Yt
+                </td>
+                {% for key, value in table31.items %}
+                     <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+        Количество серий = {{ n31 }}
+        <br>
+        Длина самой длинной серии = {{ max31 }}
+        <br>
+        Медиана = {{ me3 }}
+        <br>
+        Проверка по притерию серий:
+        <br>
+        {{ n31 }} > {{ result1 }}
+        <br>
+        {{ max31 }} < {{ tautau }}
+        <br>
+        В итоге: {% if result31 %} Гипотеза об отсутствии тренда принимается {% else %} Гипотеза об отсутствии тренда отвергается {% endif %}
+        <br><br>
+        <table class="main">
+            <tr>
+                <td>
+                    t
+                </td>
                 {% for key, value in table3.items %}
                     <td>{{ key }}</td>
                 {% endfor %}
@@ -334,14 +414,6 @@
         <br>
         Длина самой длинной серии = {{ max3 }}
         <br>
-        Проверка по притерию серий:
-        <br>
-        {{ n3 }} > {{ result1 }}
-        <br>
-        {{ max3 }} < {{ tautau }}
-        <br>
-        В итоге: {% if result31 %} Гипотеза об отсутствии тренда принимается {% else %} Гипотеза об отсутствии тренда отвергается {% endif %}
-        <br><br>
         Проверка по притерию "восходящих и нисходящих":
         <br>
         {{ n3 }} > {{ result2 }}
@@ -377,9 +449,9 @@
             </tr>
             {% endfor %}
         </table>
-        line = {{ line3 }} <br>
-        parabola = {{ parabola3 }} <br>
-        pokazatelnaya = {{ pokaz3 }} <br><br>
+        Линейная модель = {{ line1 }} <br>
+        Параболическая модель = {{ parabola1 }} <br>
+        Показательная модель = {{ pokaz1 }}
 
     </div>
 </main>

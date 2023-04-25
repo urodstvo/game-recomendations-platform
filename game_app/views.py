@@ -1215,6 +1215,11 @@ class LAB8View(View):
 
             return d
 
+        def findMe(arr):
+            arr = [arr[m] for m in range(1, 13)]
+            arr = sorted(arr)
+            return (arr[7] + arr[6]) / 2
+
         tau = 5
         tautau = math.floor(3.3 * (math.log(12) + 1))
         result1 = math.floor(1 / 2 * (12 + 1 - 1.96 * math.sqrt(12 - 1)))
@@ -1231,11 +1236,17 @@ class LAB8View(View):
                 list(Game.objects.filter(release_date__lt=start + relativedelta(months=1), release_date__gte=start)))
             start += relativedelta(months=1)
         table1 = {}
+        table11 = {}
         for m in range(1, 12):
             table1[m] = '+' if line[m + 1] >= line[m] else '-'
+        for m in range(1, 12):
+            table11[m] = '+' if line[m + 1] >= findMe(line) else '-'
+        me1 = findMe(line)
         n1 = values(table1)[0]
         max1 = values(table1)[1]
-        result11 = (result1 < n1) and (max1 < tautau)
+        n11 = values(table11)[0]
+        max11 = values(table11)[1]
+        result11 = (result1 < n11) and (max11 < tautau)
         result12 = (result2 < n1) and (max1 < tau)
         bigtable1 = bigtable(line)
         eq = equations(bigtable1)
@@ -1251,11 +1262,17 @@ class LAB8View(View):
                 list(User.objects.filter(date_joined__gte=start, date_joined__lt=start + relativedelta(months=1))))
             start += relativedelta(months=1)
         table2 = {}
+        table21 = {}
         for m in range(1, 12):
             table2[m] = '+' if users[m + 1] >= users[m] else '-'
+        for m in range(1, 12):
+            table21[m] = '+' if users[m + 1] >= findMe(users) else '-'
+        me2 = findMe(users)
         n2 = values(table2)[0]
         max2 = values(table2)[1]
-        result21 = (result1 < n2) and (max2 < tautau)
+        n21 = values(table21)[0]
+        max21 = values(table21)[1]
+        result21 = (result1 < n21) and (max21 < tautau)
         result22 = (result2 < n2) and (max2 < tau)
         bigtable2 = bigtable(users)
         eq = equations(bigtable2)
@@ -1271,11 +1288,17 @@ class LAB8View(View):
                 list(Library.objects.filter(added_at__gte=start, added_at__lt=start + relativedelta(months=1))))
             start += relativedelta(months=1)
         table3 = {}
+        table31 = {}
         for m in range(1, 12):
             table3[m] = '+' if games[m + 1] >= games[m] else '-'
+        for m in range(1, 12):
+            table31[m] = '+' if games[m + 1] >= findMe(games) else '-'
+        me3 = findMe(games)
         n3 = values(table3)[0]
         max3 = values(table3)[1]
-        result31 = (result1 < n3) and (max3 < tautau)
+        n31 = values(table31)[0]
+        max31 = values(table31)[1]
+        result31 = (result1 < n31) and (max31 < tautau)
         result32 = (result2 < n3) and (max3 < tau)
         bigtable3 = bigtable(games)
         eq = equations(bigtable3)
@@ -1290,14 +1313,23 @@ class LAB8View(View):
                    'users': users,
                    'games': games,
                    'table1': table1,
+                   'table11': table11,
                    'max1': max1,
                    'n1': n1,
+                   'max11': max11,
+                   'n11': n11,
                    'table2': table2,
                    'max2': max2,
                    'n2': n2,
+                   'table21': table21,
+                   'max21': max21,
+                   'n21': n21,
                    'table3': table3,
                    'max3': max3,
                    'n3': n3,
+                   'table31': table31,
+                   'max31': max31,
+                   'n31': n31,
                    'tau': tau,
                    'tautau': tautau,
                    'result1': result1,
@@ -1328,5 +1360,9 @@ class LAB8View(View):
                    'model1': model1,
                    'model2': model2,
                    'model3': model3,
+
+                   'me1': me1,
+                   'me2': me2,
+                   'me3': me3,
                    }
         return render(request, 'game_app/lab8.html', context)
