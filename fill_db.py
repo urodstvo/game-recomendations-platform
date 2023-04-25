@@ -26,7 +26,7 @@ genres_arr = {'Thriller': 1, 'Science fiction': 2, "Action": 3, "Horror": 4, "Su
 
 def init_token():
     client_id = 'l5ogt2dv7937ykpust4nsb9235cbp6'
-    secret_code = 'eds88axehl8gw6kur9qkpdb0zk9e4n'
+    secret_code = 'ygxzkb1wc0d8is2iijbimevnz4rqnc'
 
     url = f'https://id.twitch.tv/oauth2/token?client_id={client_id}&client_secret={secret_code}&grant_type=client_credentials'
 

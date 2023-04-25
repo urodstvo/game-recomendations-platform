@@ -610,6 +610,8 @@ class RecView(ListView):
 
     @staticmethod
     def distCosine(vecA, vecB):
+        print(vecA)
+
         def dotProduct(vecA, vecB):
             d = 0.0
             for dim in vecA:
@@ -623,7 +625,7 @@ class RecView(ListView):
     @classmethod
     def makeMatches(self, userID, userRates, nBestUsers, nBestProducts):
         matches = [(u, self.distCosine(userRates[userID], userRates[u])) for u in userRates if u != userID]
-
+        print(userRates)
         bestMatches = sorted(matches, key=lambda x: x[1], reverse=True)[:nBestUsers]
 
         sim = dict()
@@ -900,28 +902,52 @@ class SmoothRyadView(View):
                 table1[m].append(math.ceil((line[m - 1] + line[m] + line[m + 1]) / 3))
             else:
                 match m:
-                    case 1: table1[m].append(math.ceil((line[1]*5 + line[2]*2 + line[3]*(-1)) / 6))
-                    case 12: table1[m].append(math.ceil((line[10]*5 + line[11]*2 + line[12]*(-1)) / 6))
+                    case 1:
+                        table1[m].append(math.ceil((line[1] * 5 + line[2] * 2 + line[3] * (-1)) / 6))
+                    case 12:
+                        table1[m].append(math.ceil((line[10] * 5 + line[11] * 2 + line[12] * (-1)) / 6))
 
             if 3 < m < 10:
-                table1[m].append(math.ceil((line[m - 3] + line[m - 2] + line[m - 1] + line[m] + line[m + 1] + line[m + 2] + line[m + 3]) / 7))
+                table1[m].append(math.ceil(
+                    (line[m - 3] + line[m - 2] + line[m - 1] + line[m] + line[m + 1] + line[m + 2] + line[m + 3]) / 7))
             else:
                 match m:
-                    case 1: table1[m].append(math.ceil((line[1]*39 + line[2]*8 + line[3]*4 + line[4]*4 + line[5]*1 + line[6]*4 + (-2)*line[7]) / 42))
-                    case 2: table1[m].append(math.ceil((line[1]*8 + line[2]*19 + line[3]*16 + line[4]*6 + line[5]*(-4) + line[6]*(-7) + 4*line[7]) / 42))
-                    case 3: table1[m].append(math.ceil((line[1]*(-4) + line[2]*16 + line[3]*19 + line[4]*12 + line[5]*2 + line[6]*(-4) + line[7]) / 42))
-                    case 10: table1[m].append(math.ceil((line[6]*1 + line[7]*(-4) + line[8]*2 + line[9]*12 + line[10]*19 + line[11]*16 + (-4)*line[12]) / 42))
-                    case 11: table1[m].append(math.ceil((line[6]*4 + line[7]*(-7) + line[8]*(-4) + line[9]*6 + line[10]*16 + line[11]*19 + 8*line[12]) / 42))
-                    case 12: table1[m].append(math.ceil((line[6]*2 + line[7]*4 + line[8]*1 + line[9]*(-4) + line[10]*1 + line[11]*4 + 39*line[12]) / 42))
+                    case 1:
+                        table1[m].append(math.ceil((line[1] * 39 + line[2] * 8 + line[3] * 4 + line[4] * 4 + line[
+                            5] * 1 + line[6] * 4 + (-2) * line[7]) / 42))
+                    case 2:
+                        table1[m].append(math.ceil((line[1] * 8 + line[2] * 19 + line[3] * 16 + line[4] * 6 + line[
+                            5] * (-4) + line[6] * (-7) + 4 * line[7]) / 42))
+                    case 3:
+                        table1[m].append(math.ceil((line[1] * (-4) + line[2] * 16 + line[3] * 19 + line[4] * 12 + line[
+                            5] * 2 + line[6] * (-4) + line[7]) / 42))
+                    case 10:
+                        table1[m].append(math.ceil((line[6] * 1 + line[7] * (-4) + line[8] * 2 + line[9] * 12 + line[
+                            10] * 19 + line[11] * 16 + (-4) * line[12]) / 42))
+                    case 11:
+                        table1[m].append(math.ceil((line[6] * 4 + line[7] * (-7) + line[8] * (-4) + line[9] * 6 + line[
+                            10] * 16 + line[11] * 19 + 8 * line[12]) / 42))
+                    case 12:
+                        table1[m].append(math.ceil((line[6] * 2 + line[7] * 4 + line[8] * 1 + line[9] * (-4) + line[
+                            10] * 1 + line[11] * 4 + 39 * line[12]) / 42))
 
             if 2 < m < 11:
-                table1[m].append(math.ceil((line[m - 2] * (-3) + line[m - 1] * 12 + line[m] * 17 + line[m + 1] * 12 + (-3) * line[m + 2]) / 35))
+                table1[m].append(math.ceil((line[m - 2] * (-3) + line[m - 1] * 12 + line[m] * 17 + line[m + 1] * 12 + (
+                    -3) * line[m + 2]) / 35))
             else:
                 match m:
-                    case 1: table1[m].append(math.ceil((line[1] * 31 + line[2] * 9 + line[3] * (-3) + line[4] * (-5) + 3 * line[5]) / 35))
-                    case 2: table1[m].append(math.ceil((line[1] * 9 + line[2] * 13 + line[3] * 12 + line[4] * 6 + (-5) * line[5]) / 35))
-                    case 11: table1[m].append(math.ceil((line[8] * (-5) + line[9] * 6 + line[10] * 12 + line[11] * 13 + (-9) * line[12]) / 35))
-                    case 12: table1[m].append(math.ceil((line[8] * 3 + line[9] * (-5) + line[10] * (-3) + line[11] * 9 + 31 * line[12]) / 35))
+                    case 1:
+                        table1[m].append(math.ceil(
+                            (line[1] * 31 + line[2] * 9 + line[3] * (-3) + line[4] * (-5) + 3 * line[5]) / 35))
+                    case 2:
+                        table1[m].append(
+                            math.ceil((line[1] * 9 + line[2] * 13 + line[3] * 12 + line[4] * 6 + (-5) * line[5]) / 35))
+                    case 11:
+                        table1[m].append(math.ceil(
+                            (line[8] * (-5) + line[9] * 6 + line[10] * 12 + line[11] * 13 + (-9) * line[12]) / 35))
+                    case 12:
+                        table1[m].append(math.ceil(
+                            (line[8] * 3 + line[9] * (-5) + line[10] * (-3) + line[11] * 9 + 31 * line[12]) / 35))
 
         table1[13] = ['-',
                       math.ceil(table1[10][0] + ((line[12] - line[11]) / 3)),
@@ -949,7 +975,8 @@ class SmoothRyadView(View):
                         table2[m].append(math.ceil((users[10] * 5 + users[11] * 2 + users[12] * (-1)) / 6))
 
             if 3 < m < 10:
-                table2[m].append(math.ceil((users[m - 3] + users[m - 2] + users[m - 1] + users[m] + users[m + 1] + users[m + 2] + users[m + 3]) / 7))
+                table2[m].append(math.ceil((users[m - 3] + users[m - 2] + users[m - 1] + users[m] + users[m + 1] +
+                                            users[m + 2] + users[m + 3]) / 7))
             else:
                 match m:
                     case 1:
@@ -959,20 +986,25 @@ class SmoothRyadView(View):
                         table2[m].append(math.ceil((users[1] * 8 + users[2] * 19 + users[3] * 16 + users[4] * 6 + users[
                             5] * (-4) + users[6] * (-7) + 4 * users[7]) / 42))
                     case 3:
-                        table2[m].append(math.ceil((users[1] * (-4) + users[2] * 16 + users[3] * 19 + users[4] * 12 + users[
-                            5] * 2 + users[6] * (-4) + users[7]) / 42))
+                        table2[m].append(
+                            math.ceil((users[1] * (-4) + users[2] * 16 + users[3] * 19 + users[4] * 12 + users[
+                                5] * 2 + users[6] * (-4) + users[7]) / 42))
                     case 10:
-                        table2[m].append(math.ceil((users[6] * 1 + users[7] * (-4) + users[8] * 2 + users[9] * 12 + users[
-                            10] * 19 + users[11] * 16 + (-4) * users[12]) / 42))
+                        table2[m].append(
+                            math.ceil((users[6] * 1 + users[7] * (-4) + users[8] * 2 + users[9] * 12 + users[
+                                10] * 19 + users[11] * 16 + (-4) * users[12]) / 42))
                     case 11:
-                        table2[m].append(math.ceil((users[6] * 4 + users[7] * (-7) + users[8] * (-4) + users[9] * 6 + users[
-                           10] * 16 + users[11] * 19 + 8 * users[12]) / 42))
+                        table2[m].append(
+                            math.ceil((users[6] * 4 + users[7] * (-7) + users[8] * (-4) + users[9] * 6 + users[
+                                10] * 16 + users[11] * 19 + 8 * users[12]) / 42))
                     case 12:
-                        table2[m].append(math.ceil((users[6] * 2 + users[7] * 4 + users[8] * 1 + users[9] * (-4) + users[
-                            10] * 1 + users[11] * 4 + 39 * users[12]) / 42))
+                        table2[m].append(
+                            math.ceil((users[6] * 2 + users[7] * 4 + users[8] * 1 + users[9] * (-4) + users[
+                                10] * 1 + users[11] * 4 + 39 * users[12]) / 42))
 
             if 2 < m < 11:
-                table2[m].append(math.ceil((users[m - 2] * (-3) + users[m - 1] * 12 + users[m] * 17 + users[m + 1] * 12 + (-3) * users[m + 2]) / 35))
+                table2[m].append(math.ceil((users[m - 2] * (-3) + users[m - 1] * 12 + users[m] * 17 + users[
+                    m + 1] * 12 + (-3) * users[m + 2]) / 35))
             else:
                 match m:
                     case 1:
@@ -980,7 +1012,8 @@ class SmoothRyadView(View):
                             (users[1] * 31 + users[2] * 9 + users[3] * (-3) + users[4] * (-5) + 3 * users[5]) / 35))
                     case 2:
                         table2[m].append(
-                            math.ceil((users[1] * 9 + users[2] * 13 + users[3] * 12 + users[4] * 6 + (-5) * users[5]) / 35))
+                            math.ceil(
+                                (users[1] * 9 + users[2] * 13 + users[3] * 12 + users[4] * 6 + (-5) * users[5]) / 35))
                     case 11:
                         table2[m].append(math.ceil(
                             (users[8] * (-5) + users[9] * 6 + users[10] * 12 + users[11] * 13 + (-9) * users[12]) / 35))
@@ -989,10 +1022,9 @@ class SmoothRyadView(View):
                             (users[8] * 3 + users[9] * (-5) + users[10] * (-3) + users[11] * 9 + 31 * users[12]) / 35))
 
         table2[13] = ['-',
-                      math.ceil(table2[10][0]+((users[12]-users[11])/3)),
-                      math.ceil(table2[10][1]+((users[12]-users[11])/7)),
-                      math.ceil(table2[10][2]+((users[12]-users[11])/5))]
-
+                      math.ceil(table2[10][0] + ((users[12] - users[11]) / 3)),
+                      math.ceil(table2[10][1] + ((users[12] - users[11]) / 7)),
+                      math.ceil(table2[10][2] + ((users[12] - users[11]) / 5))]
 
         games = {}
         start = datetime.now() - relativedelta(years=1)
@@ -1015,7 +1047,8 @@ class SmoothRyadView(View):
                         table3[m].append(math.ceil((games[10] * 5 + games[11] * 2 + games[12] * (-1)) / 6))
 
             if 3 < m < 10:
-                table3[m].append(math.ceil((games[m - 3] + games[m - 2] + games[m - 1] + games[m] + games[m + 1] + games[m + 2] + games[m + 3]) / 7))
+                table3[m].append(math.ceil((games[m - 3] + games[m - 2] + games[m - 1] + games[m] + games[m + 1] +
+                                            games[m + 2] + games[m + 3]) / 7))
             else:
                 match m:
                     case 1:
@@ -1035,14 +1068,15 @@ class SmoothRyadView(View):
                     case 11:
                         table3[m].append(
                             math.ceil((games[6] * 4 + games[7] * (-7) + games[8] * (-4) + games[9] * 6 + games[
-                               10] * 16 + games[11] * 19 + 8 * games[12]) / 42))
+                                10] * 16 + games[11] * 19 + 8 * games[12]) / 42))
                     case 12:
                         table3[m].append(
                             math.ceil((games[6] * 2 + games[7] * 4 + games[8] * 1 + games[9] * (-4) + games[
                                 10] * 1 + games[11] * 4 + 39 * games[12]) / 42))
 
             if 2 < m < 11:
-                table3[m].append(math.ceil((games[m - 2] * (-3) + games[m - 1] * 12 + games[m] * 17 + games[m + 1] * 12 + (-3) * games[m + 2]) / 35))
+                table3[m].append(math.ceil((games[m - 2] * (-3) + games[m - 1] * 12 + games[m] * 17 + games[
+                    m + 1] * 12 + (-3) * games[m + 2]) / 35))
             else:
                 match m:
                     case 1:
@@ -1060,9 +1094,9 @@ class SmoothRyadView(View):
                             (games[8] * 3 + games[9] * (-5) + games[10] * (-3) + games[11] * 9 + 31 * games[12]) / 35))
 
         table3[13] = ['-',
-                      math.ceil(table3[10][0]+((games[12]-games[11])/3)),
-                      math.ceil(table3[10][1]+((games[12]-games[11])/7)),
-                      math.ceil(table3[10][2]+((games[12]-games[11])/5))]
+                      math.ceil(table3[10][0] + ((games[12] - games[11]) / 3)),
+                      math.ceil(table3[10][1] + ((games[12] - games[11]) / 7)),
+                      math.ceil(table3[10][2] + ((games[12] - games[11]) / 5))]
 
         context = {'year': year,
                    'user': user.username,
@@ -1071,3 +1105,228 @@ class SmoothRyadView(View):
                    'table3': table3,
                    }
         return render(request, 'game_app/lab7.html', context)
+
+
+class LAB8View(View):
+    def get(self, request):
+        def bigtable(arr):
+            total_y = 0
+            total_t = 0
+            total_yt = 0
+            total_t_2 = 0
+            total_yt_2 = 0
+            total_t_4 = 0
+            total_lny = 0
+            total_lnyt = 0
+
+            bigtable = {}
+            for m in range(1, 13):
+                y = arr[m]
+                t = m - 6
+                yt = y * t
+                t_2 = t * t
+                yt_2 = y * t_2
+                t_4 = t_2 * t_2
+                lny = round(math.log(y), 2) if y > 0 else 0
+                lnyt = round(lny * t, 2)
+
+                total_y += y
+                total_yt += yt
+                total_t_2 += t_2
+                total_yt_2 += yt_2
+                total_t_4 += t_4
+                total_lny += lny
+                total_lnyt += lnyt
+
+                bigtable[m] = [y, t, yt, t_2, yt_2, t_4, lny, lnyt]
+
+            bigtable['Всего'] = [total_y, total_t, total_yt, total_t_2, total_yt_2, total_t_4, total_lny, total_lnyt]
+            return bigtable
+
+        def values(arr):
+            ind = 1
+            max = 1
+            n = 0
+            for m in range(2, 12):
+                if arr[m] != arr[m - 1] or m == 11:
+                    n += 1
+                    if arr[m] != arr[m - 1] and m == 11:
+                        n += 1
+                    if m - ind > max:
+                        max = m - ind
+                    ind = m
+            return [n, max]
+
+        def coefs(type, arr):
+            l0 = arr['Всего'][0] / 12
+            l1 = arr['Всего'][2] / arr['Всего'][3]
+
+            p2 = ((12 * arr['Всего'][4]) - (arr['Всего'][3] * arr['Всего'][0])) / (
+                        (12 * arr['Всего'][5]) - (arr['Всего'][3] * arr['Всего'][3]))
+            p0 = l0 - (arr['Всего'][3] / 12) * p2
+
+            pok0 = math.exp(arr['Всего'][6] / 12)
+            pok1 = math.exp(arr['Всего'][7] / arr['Всего'][3])
+
+            match type:
+                case 'line':
+                    return [round(l0, 2), round(l1, 2)]
+                case 'parabola':
+                    return [round(p0, 2), round(l1, 2), round(p2, 2)]
+                case 'pokaz':
+                    return [round(pok0, 2), round(pok1, 2)]
+
+        def modelArr(type, arr):
+            c = coefs(type, arr)
+            match type:
+                case 'line':
+                    return [round(c[0] + c[1] * t, 2) for t in range(-5, 7)]
+                case 'parabola':
+                    return [round(c[0] + c[1] * t + c[2] * t * t, 2) for t in range(-5, 7)]
+                case 'pokaz':
+                    return [round(c[0] + c[1] ** t, 2) for t in range(-5, 7)]
+
+        def equations(arr):
+            line = coefs('line', arr)
+            line = f'{line[0]} + {line[1]}*t'
+            parabola = coefs('parabola', arr)
+            parabola = f'{parabola[0]} + {parabola[1]}*t + {parabola[2]}*t^2'
+            pokaz = coefs('pokaz', arr)
+            pokaz = f'{pokaz[0]} + {pokaz[1]}^t'
+            return [line, parabola, pokaz]
+
+        def getModelDict(arr, num):
+            line_arr = modelArr('line', arr)
+            parabola_arr = modelArr('parabola', arr)
+            pokaz_arr = modelArr('pokaz', arr)
+
+            d = {}
+            for m in range(1, 13):
+                d[m] = []
+                if num == 1:
+                    d[m].append(line[m])
+                elif num == 2:
+                    d[m].append(users[m])
+                elif num == 3:
+                    d[m].append(games[m])
+                d[m].append(line_arr[m-1])
+                d[m].append(parabola_arr[m-1])
+                d[m].append(pokaz_arr[m-1])
+
+            return d
+
+        tau = 5
+        tautau = math.floor(3.3 * (math.log(12) + 1))
+        result1 = math.floor(1 / 2 * (12 + 1 - 1.96 * math.sqrt(12 - 1)))
+        result2 = math.floor(1 / 3 * (2 * 12 - 1) - 1.96 * math.sqrt((16 * 12 - 29) / 90))
+
+        user = request.GET.get('user', request.user.username)
+        user = User.objects.get(username=user)
+        year = request.GET.get('year', (datetime.now() - relativedelta(years=1)).year)
+        start = date(int(year), 1, 1)
+
+        line = {}
+        for m in range(1, 13):
+            line[m] = len(
+                list(Game.objects.filter(release_date__lt=start + relativedelta(months=1), release_date__gte=start)))
+            start += relativedelta(months=1)
+        table1 = {}
+        for m in range(1, 12):
+            table1[m] = '+' if line[m + 1] >= line[m] else '-'
+        n1 = values(table1)[0]
+        max1 = values(table1)[1]
+        result11 = (result1 < n1) and (max1 < tautau)
+        result12 = (result2 < n1) and (max1 < tau)
+        bigtable1 = bigtable(line)
+        eq = equations(bigtable1)
+        line1 = eq[0]
+        parabola1 = eq[1]
+        pokaz1 = eq[2]
+        model1 = getModelDict(bigtable1, 1)
+
+        users = {}
+        start = datetime.now() - relativedelta(years=1)
+        for m in range(1, 13):
+            users[m] = len(
+                list(User.objects.filter(date_joined__gte=start, date_joined__lt=start + relativedelta(months=1))))
+            start += relativedelta(months=1)
+        table2 = {}
+        for m in range(1, 12):
+            table2[m] = '+' if users[m + 1] >= users[m] else '-'
+        n2 = values(table2)[0]
+        max2 = values(table2)[1]
+        result21 = (result1 < n2) and (max2 < tautau)
+        result22 = (result2 < n2) and (max2 < tau)
+        bigtable2 = bigtable(users)
+        eq = equations(bigtable2)
+        line2 = eq[0]
+        parabola2 = eq[1]
+        pokaz2 = eq[2]
+        model2 = getModelDict(bigtable2, 2)
+
+        games = {}
+        start = datetime.now() - relativedelta(years=1)
+        for m in range(1, 13):
+            games[m] = len(
+                list(Library.objects.filter(added_at__gte=start, added_at__lt=start + relativedelta(months=1))))
+            start += relativedelta(months=1)
+        table3 = {}
+        for m in range(1, 12):
+            table3[m] = '+' if games[m + 1] >= games[m] else '-'
+        n3 = values(table3)[0]
+        max3 = values(table3)[1]
+        result31 = (result1 < n3) and (max3 < tautau)
+        result32 = (result2 < n3) and (max3 < tau)
+        bigtable3 = bigtable(games)
+        eq = equations(bigtable3)
+        line3 = eq[0]
+        parabola3 = eq[1]
+        pokaz3 = eq[2]
+        model3 = getModelDict(bigtable3, 3)
+
+        context = {'line': line,
+                   'year': year,
+                   'user': user.username,
+                   'users': users,
+                   'games': games,
+                   'table1': table1,
+                   'max1': max1,
+                   'n1': n1,
+                   'table2': table2,
+                   'max2': max2,
+                   'n2': n2,
+                   'table3': table3,
+                   'max3': max3,
+                   'n3': n3,
+                   'tau': tau,
+                   'tautau': tautau,
+                   'result1': result1,
+                   'result2': result2,
+                   'result11': result11,
+                   'result12': result12,
+                   'result21': result21,
+                   'result22': result22,
+                   'result31': result31,
+                   'result32': result32,
+
+                   'bigtable1': bigtable1,
+                   'bigtable2': bigtable2,
+                   'bigtable3': bigtable3,
+
+                   'line1': line1,
+                   'parabola1': parabola1,
+                   'pokaz1': pokaz1,
+
+                   'line2': line2,
+                   'parabola2': parabola2,
+                   'pokaz2': pokaz2,
+
+                   'line3': line3,
+                   'parabola3': parabola3,
+                   'pokaz3': pokaz3,
+
+                   'model1': model1,
+                   'model2': model2,
+                   'model3': model3,
+                   }
+        return render(request, 'game_app/lab8.html', context)

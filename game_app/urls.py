@@ -22,6 +22,7 @@ urlpatterns = [
     path('charts/lab6/', RyadView.as_view(), name='ryad'),
     path('create/user/', CreateUser, name='create-user'),
     path('charts/lab7/', SmoothRyadView.as_view(), name='lab7'),
+    path('charts/lab8/', LAB8View.as_view(), name='lab8'),
 
 
 ]
