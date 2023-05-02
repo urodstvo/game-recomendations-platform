@@ -1,0 +1,624 @@
+{% extends 'game_app/base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load l10n %}
+{% block css %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link type='text/css' rel="stylesheet" href="{% static 'game_app/css/general.css' %}" />
+    <title>LAB9</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawLINE1);
+      google.charts.setOnLoadCallback(drawLINE2);
+      google.charts.setOnLoadCallback(drawLINE3);
+
+      function drawLINE1() {
+        var data = google.visualization.arrayToDataTable([
+          ['Месяц', 'Фактическое значение', 'Линейная модель', 'Параболическая модель', 'Показательная модель'],{% for key, value in model.items %}
+          ["{{key}}", {{ value.0|unlocalize }}, {{ value.1|unlocalize }}, {{ value.2|unlocalize }}, {{ value.3|unlocalize }}],{% endfor %}
+        ]);
+
+        var options = {
+          title: 'График динамики выхода игр за {{ year }} год',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('line1'));
+
+        chart.draw(data, options);
+      }
+
+      function drawLINE2() {
+        var data = google.visualization.arrayToDataTable([
+          ['Месяц', 'Фактическое значение', 'Линейная модель', 'Параболическая модель', 'Показательная модель'],{% for key, value in model2.items %}
+          ["{{key}}", {{ value.0|unlocalize }}, {{ value.1|unlocalize }}, {{ value.2|unlocalize }}, {{ value.3|unlocalize }}],{% endfor %}
+        ]);
+
+        var options = {
+          title: 'График динамики регистраций новых пользователей за последние 12 месяцев',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('line2'));
+
+        chart.draw(data, options);
+      }
+
+      function drawLINE3() {
+        var data = google.visualization.arrayToDataTable([
+          ['Месяц', 'Фактическое значение', 'Линейная модель', 'Параболическая модель', 'Показательная модель'],{% for key, value in model3.items %}
+          ["{{key}}", {{ value.0|unlocalize }}, {{ value.1|unlocalize }}, {{ value.2|unlocalize }}, {{ value.3|unlocalize }}],{% endfor %}
+        ]);
+
+        var options = {
+          title: 'График динамики активности добавления игр в личные библиотеки за последние 12 месяцев',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('line3'));
+
+        chart.draw(data, options);
+      }
+
+
+    </script>
+{% endblock %}
+{% block main %}
+    <style>
+        main
+        {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            flex-direction: column;
+        }
+
+        main div
+        {
+            margin-bottom: 40px;
+        }
+
+        table
+        {
+            width: 100%;
+            text-align: center;
+            border-color: orange;
+        }
+
+        .inner td
+        {
+            width: 50%;
+        }
+
+        td
+        {
+            border: 1px solid orange;
+        }
+
+        td:has( > table)
+        {
+            border: none;
+        }
+
+        .main
+        {
+            border: 1px solid orange;
+            margin: 20px 0;
+            background-color: #222;
+        }
+
+        .grid
+        {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            column-gap: 2rem;
+        }
+
+
+    </style>
+<main>
+    <div>
+        <table class="main">
+            <tr>
+                <td>
+                    t
+                </td>
+                {% for key, value in line.items %}
+                    <td>{{ key }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    Yt
+                </td>
+                {% for key, value in line.items %}
+                     <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </table> {% comment %} Изначальная выборка {% endcomment %}
+        {% comment %} <table class="main">
+            <tr>
+                <td>№</td>
+                <td>y(t)</td>
+                <td>t</td>
+                <td>y(t)t</td>
+                <td>t^2</td>
+                <td>y(t)t^2</td>
+                <td>t^4</td>
+                <td>ln(y(t))</td>
+                <td>ln(y(t))t</td>
+            </tr>
+            {% for key, value in bigtable.items %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value.0 }}</td>
+                <td>{{ value.1 }}</td>
+                <td>{{ value.2 }}</td>
+                <td>{{ value.3 }}</td>
+                <td>{{ value.4 }}</td>
+                <td>{{ value.5 }}</td>
+                <td>{{ value.6 }}</td>
+                <td>{{ value.7 }}</td>
+            </tr>
+            {% endfor %}
+        </table> {% endcomment %} {% comment %} Большая Таблица {% endcomment %}
+        Линейная модель = {{ line_form }} <br>
+        Параболическая модель = {{ parabola_form }} <br>
+        Показательная модель = {{ pokaz_form }}
+        <br><br>
+        <div id="line1" style="width: 1500px; height: 600px;"></div>
+
+        <div class="grid">
+            <div class="line">
+                <h4>Проверка линейной модели</h4>
+                <table class="main">
+            <tr>
+                <td>
+                    t
+                </td>
+                {% for key, value in ostatok_line.items %}
+                    <td>{{ key }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    Yt
+                </td>
+                {% for key, value in ostatok_line.items %}
+                     <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </table> {% comment %} Остаточный ряд {% endcomment %}
+                <h3>Проверка с помощью критерия знаков</h3>
+                <table class="main">
+                    <tr>
+                        <td>
+                            t
+                        </td>
+                        {% for key, value in task1_line.table.items %}
+                            <td>{{ key }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>
+                            Yt
+                        </td>
+                        {% for key, value in task1_line.table.items %}
+                             <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                </table>
+                Количество серий = {{ task1_line.n }}
+                <br>
+                Длина самой длинной серии = {{ task1_line.max }}
+                <br>
+                Медиана = {{ task1_line.me }}
+                <br>
+                {{ task1_line.n }} > {{ test1 }}
+                <br>
+                {{ task1_line.max }} < {{ tautau }}
+                <br>
+                В итоге: {% if task1_line.result %} Гипотеза об отсутствии тренда принимается {% else %} Гипотеза об отсутствии тренда отвергается {% endif %}
+                <br><br>
+                <h3>Проверка с помощью коэффициентов асимметрии и эксцесса</h3>
+                <br>
+                Ассиметрия = {{ task2_line.A }}
+                <br>
+                Эксцесса = {{ task2_line.E }}
+                <br><br>
+                В итоге:
+                {% if task2_line.result %}
+                Гипотеза о нормальном распределении случайной компоненты не отвергается
+                <br>
+                | A | < {{ task2_line.check1 }}
+                <br>
+                | Э + 6/(n+1) | < {{ task2_line.check2 }}
+                <br>
+                {% else %}
+                Гипотеза о нормальном распределении случайной компоненты отвергается
+                <br>
+                | A | >= {{ task2_line.check1 }}
+                <br>
+                | Э + 6/(n+1) | >= {{ task2_line.check2 }}
+                <br>
+                {% endif %}
+                <br>
+                <h3>Проверка с помощью теста Дарбина-Уотсона</h3>
+                <br>
+                <table class="main">
+                    <tr>
+                        <td>
+                            N
+                        </td>
+                        <td>
+                            Yt
+                        </td>
+                        <td>
+                            t
+                        </td>
+                        <td>
+                            Yt^
+                        </td>
+                        <td>
+                            Et
+                        </td>
+                        <td>
+                            Et_2
+                        </td>
+                        <td>
+                            (Et-Et-1)^2
+                        </td>
+                    </tr>
+                        {% for key, value in task3_line.table.items %}
+                       <tr>
+                            <td>{{ key }}</td>
+                            <td>{{ value.0 }}</td>
+                            <td>{{ value.1 }}</td>
+                            <td>{{ value.2 }}</td>
+                            <td>{{ value.3 }}</td>
+                            <td>{{ value.4 }}</td>
+                            <td>{{ value.5 }}</td>
+                       </tr>
+                        {% endfor %}
+                </table>
+                <br>
+                d1 = {{ task3_line.d1 }}
+                <br>
+                du = {{ task3_line.du }}
+                <br>
+                d = {{ task3_line.d }}
+                <br><br>
+                В итоге:
+                {% if task3_line.result %}
+                    Значение d попало в область неопределенности
+                {% else %}
+                {% if not task3_line.check %}
+                Гипотеза об отсутствии автокорреляции отвергается, принимается гипотеза о положительной автокорреляции
+                {% else %}
+                Гипотеза об отсутствии автокорреляции принимается, гипотеза о положительной автокорреляции отвергается
+                {% endif %}
+                {% endif %}
+                <br><br>
+                <h3>Проверка с помощью теста Дарбина-Уотсона</h3>
+                <br>
+                MAPE = {{ task4_line.mape }} %
+                <br>
+                S = {{ task4_line.s }}
+                <br>
+                SSE = {{ task4_line.sse }}
+                <br>
+                MSE = {{ task4_line.mse }}
+                <br><br>
+                {{ task4_line.result }}
+            </div>
+            <div class="parabola">
+                <h4>Проверка параболической модели</h4>
+                <table class="main">
+            <tr>
+                <td>
+                    t
+                </td>
+                {% for key, value in ostatok_parabola.items %}
+                    <td>{{ key }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    Yt
+                </td>
+                {% for key, value in ostatok_parabola.items %}
+                     <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </table> {% comment %} Остаточный ряд {% endcomment %}
+                <h3>Проверка с помощью критерия знаков</h3>
+                <table class="main">
+                    <tr>
+                        <td>
+                            t
+                        </td>
+                        {% for key, value in task1_line.table.items %}
+                            <td>{{ key }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>
+                            Yt
+                        </td>
+                        {% for key, value in task1_line.table.items %}
+                             <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                </table>
+                Количество серий = {{ task1_parabola.n }}
+                <br>
+                Длина самой длинной серии = {{ task1_parabola.max }}
+                <br>
+                Медиана = {{ task1_parabola.me }}
+                <br>
+                {{ task1_parabola.n }} > {{ test1 }}
+                <br>
+                {{ task1_parabola.max }} < {{ tautau }}
+                <br>
+                В итоге: {% if task1_line.result %} Гипотеза об отсутствии тренда принимается {% else %} Гипотеза об отсутствии тренда отвергается {% endif %}
+                <br><br>
+                <h3>Проверка с помощью коэффициентов асимметрии и эксцесса</h3>
+                <br>
+                Ассиметрия = {{ task2_parabola.A }}
+                <br>
+                Эксцесса = {{ task2_parabola.E }}
+                <br><br>
+                В итоге:
+                {% if task2_parabola.result %}
+                Гипотеза о нормальном распределении случайной компоненты не отвергается
+                <br>
+                | A | < {{ task2_parabola.check1 }}
+                <br>
+                | Э + 6/(n+1) | < {{ task2_parabola.check2 }}
+                <br>
+                {% else %}
+                Гипотеза о нормальном распределении случайной компоненты отвергается
+                <br>
+                | A | >= {{ task2_parabola.check1 }}
+                <br>
+                | Э + 6/(n+1) | >= {{ task2_parabola.check2 }}
+                <br>
+                {% endif %}
+                <br>
+                <h3>Проверка с помощью теста Дарбина-Уотсона</h3>
+                <br>
+                <table class="main">
+                    <tr>
+                        <td>
+                            N
+                        </td>
+                        <td>
+                            Yt
+                        </td>
+                        <td>
+                            t
+                        </td>
+                        <td>
+                            Yt^
+                        </td>
+                        <td>
+                            Et
+                        </td>
+                        <td>
+                            Et_2
+                        </td>
+                        <td>
+                            (Et-Et-1)^2
+                        </td>
+                    </tr>
+                        {% for key, value in task3_parabola.table.items %}
+                       <tr>
+                            <td>{{ key }}</td>
+                            <td>{{ value.0 }}</td>
+                            <td>{{ value.1 }}</td>
+                            <td>{{ value.2 }}</td>
+                            <td>{{ value.3 }}</td>
+                            <td>{{ value.4 }}</td>
+                            <td>{{ value.5 }}</td>
+                       </tr>
+                        {% endfor %}
+                </table>
+                <br>
+                d1 = {{ task3_parabola.d1 }}
+                <br>
+                du = {{ task3_parabola.du }}
+                <br>
+                d = {{ task3_parabola.d }}
+                <br><br>
+                В итоге:
+                {% if task3_parabola.result %}
+                    Значение d попало в область неопределенности
+                {% else %}
+                {% if not task3_parabola.check %}
+                Гипотеза об отсутствии автокорреляции отвергается, принимается гипотеза о положительной автокорреляции
+                {% else %}
+                Гипотеза об отсутствии автокорреляции принимается, гипотеза о положительной автокорреляции отвергается
+                {% endif %}
+                {% endif %}
+                <br><br>
+                <h3>Проверка с помощью теста Дарбина-Уотсона</h3>
+                <br>
+                MAPE = {{ task4_parabola.mape }} %
+                <br>
+                S = {{ task4_parabola.s }}
+                <br>
+                SSE = {{ task4_parabola.sse }}
+                <br>
+                MSE = {{ task4_parabola.mse }}
+                <br><br>
+                {{ task4_parabola.result }}
+            </div>
+            <div class="pokaz">
+                <h4>Проверка показательной модели</h4>
+                <table class="main">
+            <tr>
+                <td>
+                    t
+                </td>
+                {% for key, value in ostatok_pokaz.items %}
+                    <td>{{ key }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    Yt
+                </td>
+                {% for key, value in ostatok_pokaz.items %}
+                     <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </table> {% comment %} Остаточный ряд {% endcomment %}
+                <h3>Проверка с помощью критерия знаков</h3>
+                <table class="main">
+                    <tr>
+                        <td>
+                            t
+                        </td>
+                        {% for key, value in task1_pokaz.table.items %}
+                            <td>{{ key }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>
+                            Yt
+                        </td>
+                        {% for key, value in task1_pokaz.table.items %}
+                             <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                </table>
+                Количество серий = {{ task1_pokaz.n }}
+                <br>
+                Длина самой длинной серии = {{ task1_pokaz.max }}
+                <br>
+                Медиана = {{ task1_pokaz.me }}
+                <br>
+                {{ task1_pokaz.n }} > {{ test1 }}
+                <br>
+                {{ task1_pokaz.max }} < {{ tautau }}
+                <br>
+                В итоге: {% if task1_pokaz.result %} Гипотеза об отсутствии тренда принимается {% else %} Гипотеза об отсутствии тренда отвергается {% endif %}
+                <br><br>
+                <h3>Проверка с помощью коэффициентов асимметрии и эксцесса</h3>
+                <br>
+                Ассиметрия = {{ task2_pokaz.A }}
+                <br>
+                Эксцесса = {{ task2_pokaz.E }}
+                <br><br>
+                В итоге:
+                {% if task2_pokaz.result %}
+                Гипотеза о нормальном распределении случайной компоненты не отвергается
+                <br>
+                | A | < {{ task2_pokaz.check1 }}
+                <br>
+                | Э + 6/(n+1) | < {{ task2_pokaz.check2 }}
+                <br>
+                {% else %}
+                Гипотеза о нормальном распределении случайной компоненты отвергается
+                <br>
+                | A | >= {{ task2_pokaz.check1 }}
+                <br>
+                | Э + 6/(n+1) | >= {{ task2_pokaz.check2 }}
+                <br>
+                {% endif %}
+                <br>
+                <h3>Проверка с помощью теста Дарбина-Уотсона</h3>
+                <br>
+                <table class="main">
+                    <tr>
+                        <td>
+                            N
+                        </td>
+                        <td>
+                            Yt
+                        </td>
+                        <td>
+                            t
+                        </td>
+                        <td>
+                            Yt^
+                        </td>
+                        <td>
+                            Et
+                        </td>
+                        <td>
+                            Et_2
+                        </td>
+                        <td>
+                            (Et-Et-1)^2
+                        </td>
+                    </tr>
+                        {% for key, value in task3_pokaz.table.items %}
+                       <tr>
+                            <td>{{ key }}</td>
+                            <td>{{ value.0 }}</td>
+                            <td>{{ value.1 }}</td>
+                            <td>{{ value.2 }}</td>
+                            <td>{{ value.3 }}</td>
+                            <td>{{ value.4 }}</td>
+                            <td>{{ value.5 }}</td>
+                       </tr>
+                        {% endfor %}
+                </table>
+                <br>
+                d1 = {{ task3_pokaz.d1 }}
+                <br>
+                du = {{ task3_pokaz.du }}
+                <br>
+                d = {{ task3_pokaz.d }}
+                <br><br>
+                В итоге:
+                {% if task3_pokaz.result %}
+                    Значение d попало в область неопределенности
+                {% else %}
+                {% if not task3_pokaz.check %}
+                Гипотеза об отсутствии автокорреляции отвергается, принимается гипотеза о положительной автокорреляции
+                {% else %}
+                Гипотеза об отсутствии автокорреляции принимается, гипотеза о положительной автокорреляции отвергается
+                {% endif %}
+                {% endif %}
+                <br><br>
+                <h3>Проверка с помощью теста Дарбина-Уотсона</h3>
+                <br>
+                MAPE = {{ task4_pokaz.mape }} %
+                <br>
+                S = {{ task4_pokaz.s }}
+                <br>
+                SSE = {{ task4_pokaz.sse }}
+                <br>
+                MSE = {{ task4_pokaz.mse }}
+                <br><br>
+                {{ task4_pokaz.result }}
+            </div>
+        </div>
+
+        <br>
+        {% if task4_line.mape < task4_parabola.mape %}
+            {% if task4_line.mape < task4_pokaz.mape %}
+                Линейная модель является самой точной
+            {% else %}
+                Показательная модель является самой точной
+            {% endif %}
+        {% else %}
+            {% if task4_parabola.mape < task4_pokaz.mape %}
+                Параболическая модель является самой точной
+            {% else %}
+                Показательная модель является самой точной
+            {% endif %}
+        {% endif %}
+
+    </div>
+</main>
+{% endblock %}
+{% block js %}
+{% endblock %}

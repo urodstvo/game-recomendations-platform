@@ -1225,8 +1225,8 @@ class LAB8View(View):
         result1 = math.floor(1 / 2 * (12 + 1 - 1.96 * math.sqrt(12 - 1)))
         result2 = math.floor(1 / 3 * (2 * 12 - 1) - 1.96 * math.sqrt((16 * 12 - 29) / 90))
 
-        user = request.GET.get('user', request.user.username)
-        user = User.objects.get(username=user)
+        # user = request.GET.get('user', request.user.username)
+        # user = User.objects.get(username=user)
         year = request.GET.get('year', (datetime.now() - relativedelta(years=1)).year)
         start = date(int(year), 1, 1)
 
@@ -1309,7 +1309,7 @@ class LAB8View(View):
 
         context = {'line': line,
                    'year': year,
-                   'user': user.username,
+                   # 'user': user.username,
                    'users': users,
                    'games': games,
                    'table1': table1,
@@ -1366,3 +1366,295 @@ class LAB8View(View):
                    'me3': me3,
                    }
         return render(request, 'game_app/lab8.html', context)
+
+class LAB9View(View):
+    def get(self, request):
+        def viborka():
+            line = {}
+            graph = int(request.GET.get('num', 0))
+            match graph:
+                case 1:
+                    year = request.GET.get('year', (datetime.now() - relativedelta(years=1)).year)
+                    start = date(int(year), 1, 1)
+                    for m in range(1, 13):
+                        line[m] = len(list(Game.objects.filter(release_date__lt=start + relativedelta(months=1), release_date__gte=start)))
+                        start += relativedelta(months=1)
+                case 2:
+                    start = datetime.now() - relativedelta(years=1)
+                    for m in range(1, 13):
+                        line[m] = len(list(User.objects.filter(date_joined__gte=start, date_joined__lt=start + relativedelta(months=1))))
+                        start += relativedelta(months=1)
+                case 3:
+                    start = datetime.now() - relativedelta(years=1)
+                    for m in range(1, 13):
+                        line[m] = len(list(Library.objects.filter(added_at__gte=start, added_at__lt=start + relativedelta(months=1))))
+                        start += relativedelta(months=1)
+            return line
+
+        def bigtable(arr):
+            total_y = 0
+            total_t = 0
+            total_yt = 0
+            total_t_2 = 0
+            total_yt_2 = 0
+            total_t_4 = 0
+            total_lny = 0
+            total_lnyt = 0
+
+            bigtable = {}
+            for m in range(1, 13):
+                y = arr[m]
+                t = m - 6
+                yt = y * t
+                t_2 = t * t
+                yt_2 = y * t_2
+                t_4 = t_2 * t_2
+                lny = round(math.log(y), 2) if y > 0 else 0
+                lnyt = round(lny * t, 2)
+
+                total_y += y
+                total_yt += yt
+                total_t_2 += t_2
+                total_yt_2 += yt_2
+                total_t_4 += t_4
+                total_lny += lny
+                total_lnyt += lnyt
+
+                bigtable[m] = [y, t, yt, t_2, yt_2, t_4, lny, lnyt]
+
+            bigtable['Всего'] = [total_y, total_t, total_yt, total_t_2, total_yt_2, total_t_4, total_lny, total_lnyt]
+            return bigtable
+
+        def values(arr):
+            ind = 1
+            max = 1
+            n = 0
+            for m in range(2, 12):
+                if arr[m] != arr[m - 1] or m == 11:
+                    n += 1
+                    if arr[m] != arr[m - 1] and m == 11:
+                        n += 1
+                    if m - ind > max:
+                        max = m - ind
+                    ind = m
+            return [n, max]
+
+        def coefs(type, arr):
+            l0 = arr['Всего'][0] / 12
+            l1 = arr['Всего'][2] / arr['Всего'][3]
+
+            p2 = ((12 * arr['Всего'][4]) - (arr['Всего'][3] * arr['Всего'][0])) / (
+                        (12 * arr['Всего'][5]) - (arr['Всего'][3] * arr['Всего'][3]))
+            p0 = l0 - (arr['Всего'][3] / 12) * p2
+
+            pok0 = math.exp(arr['Всего'][6] / 12)
+            pok1 = math.exp(arr['Всего'][7] / arr['Всего'][3])
+
+            match type:
+                case 'line':
+                    return [round(l0, 2), round(l1, 2)]
+                case 'parabola':
+                    return [round(p0, 2), round(l1, 2), round(p2, 2)]
+                case 'pokaz':
+                    return [round(pok0, 2), round(pok1, 2)]
+
+        def modelArr(type, arr):
+            c = coefs(type, arr)
+            match type:
+                case 'line':
+                    return [round(c[0] + c[1] * t, 2) for t in range(-5, 7)]
+                case 'parabola':
+                    return [round(c[0] + c[1] * t + c[2] * t * t, 2) for t in range(-5, 7)]
+                case 'pokaz':
+                    return [round(c[0] + c[1] ** t, 2) for t in range(-5, 7)]
+
+        def equations(arr):
+            line = coefs('line', arr)
+            line = f'{line[0]} + {line[1]}*t'
+            parabola = coefs('parabola', arr)
+            parabola = f'{parabola[0]} + {parabola[1]}*t + {parabola[2]}*t^2'
+            pokaz = coefs('pokaz', arr)
+            pokaz = f'{pokaz[0]} + {pokaz[1]}^t'
+            return [line, parabola, pokaz]
+
+        def getModelDict(arr):
+            line_arr = modelArr('line', arr)
+            parabola_arr = modelArr('parabola', arr)
+            pokaz_arr = modelArr('pokaz', arr)
+
+            d = {}
+            for m in range(1, 13):
+                d[m] = []
+                d[m].append(line[m])
+                d[m].append(line_arr[m-1])
+                d[m].append(parabola_arr[m-1])
+                d[m].append(pokaz_arr[m-1])
+
+            return d
+
+        def findMe(arr):
+            arr = [arr[m] for m in range(1, 13)]
+            arr = sorted(arr)
+            return (arr[7] + arr[6]) / 2
+
+        def getLine(t):
+            c = coefs('line', bigtable)
+            return round(c[0] + c[1]*t, 2)
+
+        def getParabola(t):
+            c = coefs('parabola', bigtable)
+            return round(c[0] + c[1]*t + c[2]*t*t, 2)
+
+        def getPokaz(t):
+            c = coefs('pokaz', bigtable)
+            return round(c[0] + c[1]**t, 2)
+
+        def ostatok(arr, func):
+            ostatok = {}
+            for m in range(1, 13):
+                ostatok[m] = round(arr[m] - func(m-6),2)
+            return ostatok
+
+        def task1(arr): #arr - ostatok ryad
+            table_me = {}
+            me = findMe(arr)
+            for m in range(1, 12):
+                table_me[m] = '+' if arr[m + 1] >= me else '-'
+            n = values(table_me)[0]
+            max = values(table_me)[1]
+            result = (result1 < n) and (max < tautau)
+            # result2 = (result2 < n1) and (max1 < tau)
+            return {'table': table_me, 'n': n, 'max': max, 'result': result, 'me': me}
+
+        def task2(arr):
+            sum_2 = 0
+            sum_3 = 0
+            sum_4 = 0
+            n = 12
+
+            for m in range(1, 13):
+                sum_2 = arr[m] ** 2
+                sum_3 = arr[m] ** 3
+                sum_4 = arr[m] ** 4
+
+            A = round((sum_3 / n) / math.sqrt((sum_2 / n) ** 3), 2)
+            E = round((sum_4 / n) / math.sqrt((sum_2 / n) ** 3) - 3, 2)
+
+            test1 = math.sqrt(6*10/13/15)
+            test2 = math.sqrt(24*12*10*9/13/13/15/17)
+
+            check1 = round(1.5 * test1, 2)
+            check2 = round(1.5 * test2, 2)
+
+            check3 = round(2 * test1, 2)
+            check4 = round(2 * test2, 2)
+
+            result1 = abs(A) < check1 and abs(E + 6/13) < check2
+            result2 = abs(A) >= check3 or abs(E + 6/13) >= check4
+
+            return {'A': A, 'E': E, 'check1': check1 if result1 else check3, 'check2': check2 if result1 else check4, "result": result1}
+
+        def task3(arr, func):
+            table = {}
+            e_2_total = 0
+            e_diff_total = 0
+            for m in range(1, 13):
+                table[m] = [line[m], m - 6, func(m - 6), arr[m], round(arr[m] ** 2, 2)]
+                e_2_total += arr[m] ** 2
+            table[1].append('-')
+            for m in range(2, 13):
+                table[m].append(round((table[m][-1]-table[m-1][-2])**2, 2))
+                e_diff_total += (table[m][-1]-table[m-1][-2])**2
+
+            d1 = 0.97
+            du = 1.33
+
+            d = round(e_diff_total/e_2_total, 2)
+            result = d1 <= d <= du
+            check = None if result else False if d < d1 else True
+            return {'table': table, "e_2": round(e_2_total, 2), "e_diff": round(e_diff_total, 2), 'result': result, 'check': check, "d1": d1, 'du': du, 'd':d }
+
+        def task4(model):
+            arr = modelArr(model, bigtable)
+            sum = 0
+            for m in range(1, 13):
+                sum += abs((arr[m-1] - line[m]) / line[m]) if line[m] > 0 else abs((arr[m-1] - line[m]) / 1)
+
+            MAPE = round(100*(sum/12), 2)
+            S = round(math.sqrt(sum/12), 2)
+            SSE = round(sum, 2)
+            MSE = round(SSE / 10, 2)
+
+            if MAPE < 10:
+                result = 'Так как MAPE < 10%, модель имеет высокую точность'
+            elif 10 <= MAPE <= 20:
+                result = 'Так как 10% <= MAPE <= 20%, модель можно считать хорошей'
+            elif 20 < MAPE < 50:
+                result = 'Так как 20% < MAPE < 50%, модель можно считать удовлетворительной'
+            else:
+                result = 'Так как MAPE > 50%, модель можно считать плохой'
+
+            return {"mape": MAPE, 's': S, 'sse': SSE, 'mse': MSE, 'result': result}
+
+
+
+        tau = 5
+        tautau = math.floor(3.3 * (math.log(12) + 1))
+        result1 = math.floor(1 / 2 * (12 + 1 - 1.96 * math.sqrt(12 - 1)))
+        result2 = math.floor(1 / 3 * (2 * 12 - 1) - 1.96 * math.sqrt((16 * 12 - 29) / 90))
+
+        line = viborka()
+        bigtable = bigtable(line)
+
+        ostatok_line = ostatok(line, getLine)
+        task1_line = task1(ostatok_line)
+        task2_line = task2(ostatok_line)
+        task3_line = task3(ostatok_line, getLine)
+        task4_line = task4('line')
+
+        ostatok_parabola = ostatok(line, getParabola)
+        task1_parabola = task1(ostatok_parabola)
+        task2_parabola = task2(ostatok_parabola)
+        task3_parabola = task3(ostatok_parabola, getParabola)
+        task4_parabola = task4('parabola')
+
+        ostatok_pokaz = ostatok(line, getPokaz)
+        task1_pokaz = task1(ostatok_pokaz)
+        task2_pokaz = task2(ostatok_pokaz)
+        task3_pokaz = task3(ostatok_pokaz, getPokaz)
+        task4_pokaz = task4('pokaz')
+
+        eq = equations(bigtable)
+        line_form = eq[0]
+        parabola_form = eq[1]
+        pokaz_form = eq[2]
+        model = getModelDict(bigtable)
+
+        context = { 'line': line,
+                    'bigtable': bigtable,
+                    'line_form': line_form,
+                    "parabola_form": parabola_form,
+                    "pokaz_form": pokaz_form,
+                    "model": model,
+                    "ostatok": ostatok,
+                    "ostatok_line": ostatok_line,
+                    "ostatok_parabola": ostatok_parabola,
+                    "ostatok_pokaz": ostatok_pokaz,
+                    "task1_line": task1_line,
+                    "task2_line": task2_line,
+                    "task3_line": task3_line,
+                    "task4_line": task4_line,
+                    "task1_parabola": task1_parabola,
+                    "task2_parabola": task2_parabola,
+                    "task3_parabola": task3_parabola,
+                    "task4_parabola": task4_parabola,
+                    "task1_pokaz": task1_pokaz,
+                    "task2_pokaz": task2_pokaz,
+                    "task3_pokaz": task3_pokaz,
+                    "task4_pokaz": task4_pokaz,
+                    "test1": result1,
+                    "test2": result2,
+                    'tau': tau,
+                    'tautau': tautau,
+                   }
+        return render(request, 'game_app/lab9.html', context)
