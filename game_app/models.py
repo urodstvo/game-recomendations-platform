@@ -185,7 +185,7 @@ class MessageTopics(models.Model):
 class Message(models.Model):
     topic = models.ForeignKey(MessageTopics, on_delete=models.SET_DEFAULT, default='Topic was deleted')
     text = models.TextField()
-    send_at = models.DateTimeField(auto_now=True)
+    send_at = models.DateTimeField(auto_now=True, editable=True)
     shown_to = models.ManyToManyField(User, blank=True, editable=False)
     isSend = models.BooleanField(blank=True, default=False)
 

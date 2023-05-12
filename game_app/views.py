@@ -1162,7 +1162,7 @@ class LAB8View(View):
             l1 = arr['Всего'][2] / arr['Всего'][3]
 
             p2 = ((12 * arr['Всего'][4]) - (arr['Всего'][3] * arr['Всего'][0])) / (
-                        (12 * arr['Всего'][5]) - (arr['Всего'][3] * arr['Всего'][3]))
+                    (12 * arr['Всего'][5]) - (arr['Всего'][3] * arr['Всего'][3]))
             p0 = l0 - (arr['Всего'][3] / 12) * p2
 
             pok0 = math.exp(arr['Всего'][6] / 12)
@@ -1209,9 +1209,9 @@ class LAB8View(View):
                     d[m].append(users[m])
                 elif num == 3:
                     d[m].append(games[m])
-                d[m].append(line_arr[m-1])
-                d[m].append(parabola_arr[m-1])
-                d[m].append(pokaz_arr[m-1])
+                d[m].append(line_arr[m - 1])
+                d[m].append(parabola_arr[m - 1])
+                d[m].append(pokaz_arr[m - 1])
 
             return d
 
@@ -1367,6 +1367,7 @@ class LAB8View(View):
                    }
         return render(request, 'game_app/lab8.html', context)
 
+
 class LAB9View(View):
     def get(self, request):
         def viborka():
@@ -1375,21 +1376,28 @@ class LAB9View(View):
             match graph:
                 case 1:
                     year = request.GET.get('year', (datetime.now() - relativedelta(years=1)).year)
-                    start = date(int(year), 1, 1)
+                    # start = date(int(year), 1, 1)
+                    start = date(2000, 1, 1)
                     for m in range(1, 13):
-                        line[m] = len(list(Game.objects.filter(release_date__lt=start + relativedelta(months=1), release_date__gte=start)))
+                        line[m] = len(list(Game.objects.filter(release_date__lt=start + relativedelta(months=1),
+                                                               release_date__gte=start)))
                         start += relativedelta(months=1)
+                    title = "График динамики выхода игр за 2022 год"
                 case 2:
                     start = datetime.now() - relativedelta(years=1)
                     for m in range(1, 13):
-                        line[m] = len(list(User.objects.filter(date_joined__gte=start, date_joined__lt=start + relativedelta(months=1))))
+                        line[m] = len(list(User.objects.filter(date_joined__gte=start,
+                                                               date_joined__lt=start + relativedelta(months=1))))
                         start += relativedelta(months=1)
+                    title = "График динамики регистраций новых пользователей за последние 12 месяцев"
                 case 3:
                     start = datetime.now() - relativedelta(years=1)
                     for m in range(1, 13):
-                        line[m] = len(list(Library.objects.filter(added_at__gte=start, added_at__lt=start + relativedelta(months=1))))
+                        line[m] = len(list(
+                            Library.objects.filter(added_at__gte=start, added_at__lt=start + relativedelta(months=1))))
                         start += relativedelta(months=1)
-            return line
+                    title = "График динамики активности добавления игр в личные библиотеки за последние 12 месяцев"
+            return [line, title]
 
         def bigtable(arr):
             total_y = 0
@@ -1444,7 +1452,7 @@ class LAB9View(View):
             l1 = arr['Всего'][2] / arr['Всего'][3]
 
             p2 = ((12 * arr['Всего'][4]) - (arr['Всего'][3] * arr['Всего'][0])) / (
-                        (12 * arr['Всего'][5]) - (arr['Всего'][3] * arr['Всего'][3]))
+                    (12 * arr['Всего'][5]) - (arr['Всего'][3] * arr['Всего'][3]))
             p0 = l0 - (arr['Всего'][3] / 12) * p2
 
             pok0 = math.exp(arr['Всего'][6] / 12)
@@ -1486,9 +1494,9 @@ class LAB9View(View):
             for m in range(1, 13):
                 d[m] = []
                 d[m].append(line[m])
-                d[m].append(line_arr[m-1])
-                d[m].append(parabola_arr[m-1])
-                d[m].append(pokaz_arr[m-1])
+                d[m].append(line_arr[m - 1])
+                d[m].append(parabola_arr[m - 1])
+                d[m].append(pokaz_arr[m - 1])
 
             return d
 
@@ -1499,23 +1507,23 @@ class LAB9View(View):
 
         def getLine(t):
             c = coefs('line', bigtable)
-            return round(c[0] + c[1]*t, 2)
+            return round(c[0] + c[1] * t, 2)
 
         def getParabola(t):
             c = coefs('parabola', bigtable)
-            return round(c[0] + c[1]*t + c[2]*t*t, 2)
+            return round(c[0] + c[1] * t + c[2] * t * t, 2)
 
         def getPokaz(t):
             c = coefs('pokaz', bigtable)
-            return round(c[0] + c[1]**t, 2)
+            return round(c[0] + c[1] ** t, 2)
 
         def ostatok(arr, func):
             ostatok = {}
             for m in range(1, 13):
-                ostatok[m] = round(arr[m] - func(m-6),2)
+                ostatok[m] = round(arr[m] - func(m - 6), 2)
             return ostatok
 
-        def task1(arr): #arr - ostatok ryad
+        def task1(arr):  # arr - ostatok ryad
             table_me = {}
             me = findMe(arr)
             for m in range(1, 12):
@@ -1540,8 +1548,8 @@ class LAB9View(View):
             A = round((sum_3 / n) / math.sqrt((sum_2 / n) ** 3), 2)
             E = round((sum_4 / n) / math.sqrt((sum_2 / n) ** 3) - 3, 2)
 
-            test1 = math.sqrt(6*10/13/15)
-            test2 = math.sqrt(24*12*10*9/13/13/15/17)
+            test1 = math.sqrt(6 * 10 / 13 / 15)
+            test2 = math.sqrt(24 * 12 * 10 * 9 / 13 / 13 / 15 / 17)
 
             check1 = round(1.5 * test1, 2)
             check2 = round(1.5 * test2, 2)
@@ -1549,10 +1557,11 @@ class LAB9View(View):
             check3 = round(2 * test1, 2)
             check4 = round(2 * test2, 2)
 
-            result1 = abs(A) < check1 and abs(E + 6/13) < check2
-            result2 = abs(A) >= check3 or abs(E + 6/13) >= check4
+            result1 = abs(A) < check1 and abs(E + 6 / 13) < check2
+            result2 = abs(A) >= check3 or abs(E + 6 / 13) >= check4
 
-            return {'A': A, 'E': E, 'check1': check1 if result1 else check3, 'check2': check2 if result1 else check4, "result": result1}
+            return {'A': A, 'E': E, 'check1': check1 if result1 else check3, 'check2': check2 if result1 else check4,
+                    "result": result1}
 
         def task3(arr, func):
             table = {}
@@ -1563,25 +1572,26 @@ class LAB9View(View):
                 e_2_total += arr[m] ** 2
             table[1].append('-')
             for m in range(2, 13):
-                table[m].append(round((table[m][-1]-table[m-1][-2])**2, 2))
-                e_diff_total += (table[m][-1]-table[m-1][-2])**2
+                table[m].append(round((table[m][-2] - table[m - 1][-3]) ** 2, 2))
+                e_diff_total += table[m][-1]
 
             d1 = 0.97
             du = 1.33
 
-            d = round(e_diff_total/e_2_total, 2)
+            d = round(e_diff_total / e_2_total, 2)
             result = d1 <= d <= du
             check = None if result else False if d < d1 else True
-            return {'table': table, "e_2": round(e_2_total, 2), "e_diff": round(e_diff_total, 2), 'result': result, 'check': check, "d1": d1, 'du': du, 'd':d }
+            return {'table': table, "e_2": round(e_2_total, 2), "e_diff": round(e_diff_total, 2), 'result': result,
+                    'check': check, "d1": d1, 'du': du, 'd': d}
 
         def task4(model):
             arr = modelArr(model, bigtable)
             sum = 0
             for m in range(1, 13):
-                sum += abs((arr[m-1] - line[m]) / line[m]) if line[m] > 0 else abs((arr[m-1] - line[m]) / 1)
+                sum += abs((arr[m - 1] - line[m]) / line[m]) if line[m] > 0 else abs((arr[m - 1] - line[m]) / 1)
 
-            MAPE = round(100*(sum/12), 2)
-            S = round(math.sqrt(sum/12), 2)
+            MAPE = round(100 * (sum / 12), 2)
+            S = round(math.sqrt(sum / 12), 2)
             SSE = round(sum, 2)
             MSE = round(SSE / 10, 2)
 
@@ -1596,14 +1606,12 @@ class LAB9View(View):
 
             return {"mape": MAPE, 's': S, 'sse': SSE, 'mse': MSE, 'result': result}
 
-
-
         tau = 5
         tautau = math.floor(3.3 * (math.log(12) + 1))
         result1 = math.floor(1 / 2 * (12 + 1 - 1.96 * math.sqrt(12 - 1)))
         result2 = math.floor(1 / 3 * (2 * 12 - 1) - 1.96 * math.sqrt((16 * 12 - 29) / 90))
 
-        line = viborka()
+        line, title = viborka()
         bigtable = bigtable(line)
 
         ostatok_line = ostatok(line, getLine)
@@ -1630,31 +1638,427 @@ class LAB9View(View):
         pokaz_form = eq[2]
         model = getModelDict(bigtable)
 
-        context = { 'line': line,
-                    'bigtable': bigtable,
-                    'line_form': line_form,
-                    "parabola_form": parabola_form,
-                    "pokaz_form": pokaz_form,
-                    "model": model,
-                    "ostatok": ostatok,
-                    "ostatok_line": ostatok_line,
-                    "ostatok_parabola": ostatok_parabola,
-                    "ostatok_pokaz": ostatok_pokaz,
-                    "task1_line": task1_line,
-                    "task2_line": task2_line,
-                    "task3_line": task3_line,
-                    "task4_line": task4_line,
-                    "task1_parabola": task1_parabola,
-                    "task2_parabola": task2_parabola,
-                    "task3_parabola": task3_parabola,
-                    "task4_parabola": task4_parabola,
-                    "task1_pokaz": task1_pokaz,
-                    "task2_pokaz": task2_pokaz,
-                    "task3_pokaz": task3_pokaz,
-                    "task4_pokaz": task4_pokaz,
-                    "test1": result1,
-                    "test2": result2,
-                    'tau': tau,
-                    'tautau': tautau,
+        context = {'line': line,
+                   'bigtable': bigtable,
+                   'line_form': line_form,
+                   "parabola_form": parabola_form,
+                   "pokaz_form": pokaz_form,
+                   "model": model,
+                   "ostatok": ostatok,
+                   "ostatok_line": ostatok_line,
+                   "ostatok_parabola": ostatok_parabola,
+                   "ostatok_pokaz": ostatok_pokaz,
+                   "task1_line": task1_line,
+                   "task2_line": task2_line,
+                   "task3_line": task3_line,
+                   "task4_line": task4_line,
+                   "task1_parabola": task1_parabola,
+                   "task2_parabola": task2_parabola,
+                   "task3_parabola": task3_parabola,
+                   "task4_parabola": task4_parabola,
+                   "task1_pokaz": task1_pokaz,
+                   "task2_pokaz": task2_pokaz,
+                   "task3_pokaz": task3_pokaz,
+                   "task4_pokaz": task4_pokaz,
+                   "test1": result1,
+                   "test2": result2,
+                   'tau': tau,
+                   'tautau': tautau,
+                   "title": title,
+                   }
+        return render(request, 'game_app/lab9.html', context)
+
+
+class LAB10View(View):
+    def get(self, request):
+        def Task1():
+            start = date(2015, 1, 1)
+            result = {}
+            mobile = Game.objects.filter(platforms__in=[7, 8])
+            console = Game.objects.filter(platforms__in=[5, 4, 3, 1])
+            desktop = Game.objects.filter(platforms__in=[2, 6])
+            for m in range(0, 6):
+                result[start.year + m] = []
+                result[start.year + m].append(len(list(mobile.filter(release_date__gte=start + relativedelta(years=m),
+                                                                     release_date__lt=start + relativedelta(
+                                                                         years=m + 1)))))
+                result[start.year + m].append(len(list(console.filter(release_date__gte=start + relativedelta(years=m),
+                                                                      release_date__lt=start + relativedelta(
+                                                                          years=m + 1)))))
+                result[start.year + m].append(len(list(desktop.filter(release_date__gte=start + relativedelta(years=m),
+                                                                      release_date__lt=start + relativedelta(
+                                                                          years=m + 1)))))
+            return result
+
+        def Task2():
+            # x - кол-во писем, отправленных по теме
+            # y - кол-во рассылок по теме
+            # size - кол-во подписчиков темы
+            # region - тема рассылки
+            # id - сокращение тем рассылок
+            result = {}
+            start = datetime(2023, 1, 1)
+            topics = MessageTopics.objects.all()
+            for t in topics:
+                messages = Message.objects.filter(topic=t)
+                y = len(list(messages))
+                x = 0
+                for m in messages:
+                    x += len(list(m.shown_to.all()))
+                size = len(list(t.users.all()))
+                region = t.name
+                id = ''
+                if 'Добав' in region:
+                    id = 'ADD'
+                elif 'Обнов' in region:
+                    id = 'UPD'
+                else:
+                    id = 'T' + region[-1]
+                result[id] = [x, y, region, size]
+
+            return result
+
+        def Task3():
+            result = []
+            start = datetime(2015, 1, 1)
+            while start != datetime(2016, 1, 1):
+                result.append(
+                    {
+                        'year': start.year,
+                        'month': start.month - 1,
+                        'day': start.day,
+                        'count': Game.objects.filter(release_date=start).count()
+                    }
+                )
+                start += relativedelta(days=1)
+
+            return result
+        def Task4():
+            result = [['Популярные жанры', '', '']]
+            genres = [4, 24, 30, 33, 51]
+            for genre in genres:
+                name = Genres.objects.get(pk=genre).name
+                result.append([name, 'Популярные жанры', ''])
+                games = Game.objects.filter(genres__in=[genre])[:5]
+                for game in games:
+                    result.append([game.name, name, ''])
+            return result
+
+        def Task6():
+            result = []
+            platform = {"Мобил. устройства": [7, 8],
+                        "Консол. устройства": [5, 4, 3, 1],
+                        "Настол. устройства": [2, 6],
+                        }
+            mode = {"Для одного игрока": 46,
+                    "Для онлайн игры": 47,
+                    }
+            for name, arr in platform.items():
+                for genre, id in mode.items():
+                    el = [name, genre, len(Game.objects.filter(platforms__in=arr, genres__in=[id]))]
+                    # print(el)
+                    result.append(el)
+
+            return result
+
+        context = {"task1": Task1(),
+                   "task2": Task2(),
+                   "task3": Task3(),
+                   "task4": Task4(),
+                   "task6": Task6(),
+                   }
+        return render(request, 'game_app/lab10.html', context)
+
+class LAB9dopView(View):
+    def get(self, request):
+        n = 12*20
+        def viborka():
+            n = 12 * 20
+            line = {}
+            year = request.GET.get('year', (datetime.now() - relativedelta(years=1)).year)
+            # start = date(int(year), 1, 1)
+            start = date(2000, 1, 1)
+            for m in range(1, n+1):
+                line[m] = len(list(Game.objects.filter(release_date__lt=start + relativedelta(months=1),
+                                                       release_date__gte=start)))
+                start += relativedelta(months=1)
+            title = "График динамики выхода игр c 2000 годf"
+            return [line, title]
+
+        def bigtable(arr):
+            n = 12*20
+            total_y = 0
+            total_t = 0
+            total_yt = 0
+            total_t_2 = 0
+            total_yt_2 = 0
+            total_t_4 = 0
+            total_lny = 0
+            total_lnyt = 0
+
+            bigtable = {}
+            for m in range(1, n+1):
+                y = arr[m]
+                t = m - 6
+                yt = y * t
+                t_2 = t * t
+                yt_2 = y * t_2
+                t_4 = t_2 * t_2
+                lny = round(math.log(y), 2) if y > 0 else 0
+                lnyt = round(lny * t, 2)
+
+                total_y += y
+                total_yt += yt
+                total_t_2 += t_2
+                total_yt_2 += yt_2
+                total_t_4 += t_4
+                total_lny += lny
+                total_lnyt += lnyt
+
+                bigtable[m] = [y, t, yt, t_2, yt_2, t_4, lny, lnyt]
+
+            bigtable['Всего'] = [total_y, total_t, total_yt, total_t_2, total_yt_2, total_t_4, total_lny, total_lnyt]
+            return bigtable
+
+        def values(arr):
+            n = 12*20
+            ind = 1
+            max = 1
+            nn = 0
+            for m in range(2, n):
+                if arr[m] != arr[m - 1] or m == n-1:
+                    nn += 1
+                    if arr[m] != arr[m - 1] and m == n-1:
+                        nn += 1
+                    if m - ind > max:
+                        max = m - ind
+                    ind = m
+            return [nn, max]
+
+        def coefs(type, arr):
+            n = 12*20
+            l0 = arr['Всего'][0] / n
+            l1 = arr['Всего'][2] / arr['Всего'][3]
+
+            p2 = ((n * arr['Всего'][4]) - (arr['Всего'][3] * arr['Всего'][0])) / (
+                    (n * arr['Всего'][5]) - (arr['Всего'][3] * arr['Всего'][3]))
+            p0 = l0 - (arr['Всего'][3] / n) * p2
+
+            pok0 = math.exp(arr['Всего'][6] / n)
+            pok1 = math.exp(arr['Всего'][7] / arr['Всего'][3])
+
+            match type:
+                case 'line':
+                    return [round(l0, 2), round(l1, 2)]
+                case 'parabola':
+                    return [round(p0, 2), round(l1, 2), round(p2, 2)]
+                case 'pokaz':
+                    return [round(pok0, 2), round(pok1, 2)]
+
+        def modelArr(type, arr):
+            c = coefs(type, arr)
+            match type:
+                case 'line':
+                    return [round(c[0] + c[1] * t, 2) for t in range(-119, 121)]
+                case 'parabola':
+                    return [round(c[0] + c[1] * t + c[2] * t * t, 2) for t in range(-119, 121)]
+                case 'pokaz':
+                    return [round(c[0] + c[1] ** t, 2) for t in range(-119, 121)]
+
+        def equations(arr):
+            line = coefs('line', arr)
+            line = f'{line[0]} + {line[1]}*t'
+            parabola = coefs('parabola', arr)
+            parabola = f'{parabola[0]} + {parabola[1]}*t + {parabola[2]}*t^2'
+            pokaz = coefs('pokaz', arr)
+            pokaz = f'{pokaz[0]} + {pokaz[1]}^t'
+            return [line, parabola, pokaz]
+
+        def getModelDict(arr):
+            n = 12*20
+            line_arr = modelArr('line', arr)
+            parabola_arr = modelArr('parabola', arr)
+            pokaz_arr = modelArr('pokaz', arr)
+
+            d = {}
+            for m in range(1, n+1):
+                d[m] = []
+                d[m].append(line[m])
+                d[m].append(line_arr[m - 1])
+                d[m].append(parabola_arr[m - 1])
+                d[m].append(pokaz_arr[m - 1])
+
+            return d
+
+        def findMe(arr):
+            n = 12*20
+            arr = [arr[m] for m in range(1, n+1)]
+            arr = sorted(arr)
+            return (arr[round(n/2)] + arr[round(n/2+1)]) / 2
+
+        def getLine(t):
+            c = coefs('line', bigtable)
+            return round(c[0] + c[1] * t, 2)
+
+        def getParabola(t):
+            c = coefs('parabola', bigtable)
+            return round(c[0] + c[1] * t + c[2] * t * t, 2)
+
+        def getPokaz(t):
+            c = coefs('pokaz', bigtable)
+            return round(c[0] + c[1] ** t, 2)
+
+        def ostatok(arr, func):
+            n = 12*20
+            ostatok = {}
+            for m in range(1, n+1):
+                ostatok[m] = round(arr[m] - func(m - 6), 2)
+            return ostatok
+
+        def task1(arr):  # arr - ostatok ryad
+            n = 12*20
+            table_me = {}
+            me = findMe(arr)
+            for m in range(1, n):
+                table_me[m] = '+' if arr[m + 1] >= me else '-'
+            x = values(table_me)[0]
+            max = values(table_me)[1]
+            result = (result1 < x) and (max < tautau)
+            # result2 = (result2 < n1) and (max1 < tau)
+            return {'table': table_me, 'n': x, 'max': max, 'result': result, 'me': me}
+
+        def task2(arr):
+            sum_2 = 0
+            sum_3 = 0
+            sum_4 = 0
+            n = 12*20
+
+            for m in range(1, n+1):
+                sum_2 = arr[m] ** 2
+                sum_3 = arr[m] ** 3
+                sum_4 = arr[m] ** 4
+
+            A = round((sum_3 / n) / math.sqrt((sum_2 / n) ** 3), 2)
+            E = round((sum_4 / n) / math.sqrt((sum_2 / n) ** 3) - 3, 2)
+
+            test1 = math.sqrt(6 * 10 / 13 / 15)
+            test2 = math.sqrt(24 * 12 * 10 * 9 / 13 / 13 / 15 / 17)
+
+            check1 = round(1.5 * test1, 2)
+            check2 = round(1.5 * test2, 2)
+
+            check3 = round(2 * test1, 2)
+            check4 = round(2 * test2, 2)
+
+            result1 = abs(A) < check1 and abs(E + 6 / 13) < check2
+            result2 = abs(A) >= check3 or abs(E + 6 / 13) >= check4
+
+            return {'A': A, 'E': E, 'check1': check1 if result1 else check3, 'check2': check2 if result1 else check4,
+                    "result": result1}
+
+        def task3(arr, func):
+            n = 12*20
+            table = {}
+            e_2_total = 0
+            e_diff_total = 0
+            for m in range(1, n+1):
+                table[m] = [line[m], m - 6, func(m - 6), arr[m], round(arr[m] ** 2, 2)]
+                e_2_total += arr[m] ** 2
+            table[1].append('-')
+            for m in range(2, n+1):
+                table[m].append(round((table[m][-2] - table[m - 1][-3]) ** 2, 2))
+                e_diff_total += table[m][-1]
+
+            d1 = 0.97
+            du = 1.33
+
+            d = round(e_diff_total / e_2_total, 2)
+            result = d1 <= d <= du
+            check = None if result else False if d < d1 else True
+            return {'table': table, "e_2": round(e_2_total, 2), "e_diff": round(e_diff_total, 2), 'result': result,
+                    'check': check, "d1": d1, 'du': du, 'd': d}
+
+        def task4(model):
+            n = 12*20
+            arr = modelArr(model, bigtable)
+            sum = 0
+            for m in range(1, n+1):
+                sum += abs((arr[m - 1] - line[m]) / line[m]) if line[m] > 0 else abs((arr[m - 1] - line[m]) / 1)
+
+            MAPE = round(100 * (sum / n), 2)
+            S = round(math.sqrt(sum / n), 2)
+            SSE = round(sum, 2)
+            MSE = round(SSE / n-2, 2)
+
+            if MAPE < 10:
+                result = 'Так как MAPE < 10%, модель имеет высокую точность'
+            elif 10 <= MAPE <= 20:
+                result = 'Так как 10% <= MAPE <= 20%, модель можно считать хорошей'
+            elif 20 < MAPE < 50:
+                result = 'Так как 20% < MAPE < 50%, модель можно считать удовлетворительной'
+            else:
+                result = 'Так как MAPE > 50%, модель можно считать плохой'
+
+            return {"mape": MAPE, 's': S, 'sse': SSE, 'mse': MSE, 'result': result}
+
+        tau = 5
+        tautau = math.floor(3.3 * (math.log(n) + 1))
+        result1 = math.floor(1 / 2 * (n + 1 - 1.96 * math.sqrt(n - 1)))
+        result2 = math.floor(1 / 3 * (2 * n - 1) - 1.96 * math.sqrt((16 * n - 29) / 90))
+
+        line, title = viborka()
+        bigtable = bigtable(line)
+
+        ostatok_line = ostatok(line, getLine)
+        task1_line = task1(ostatok_line)
+        task2_line = task2(ostatok_line)
+        task3_line = task3(ostatok_line, getLine)
+        task4_line = task4('line')
+
+        ostatok_parabola = ostatok(line, getParabola)
+        task1_parabola = task1(ostatok_parabola)
+        task2_parabola = task2(ostatok_parabola)
+        task3_parabola = task3(ostatok_parabola, getParabola)
+        task4_parabola = task4('parabola')
+
+        ostatok_pokaz = ostatok(line, getPokaz)
+        task1_pokaz = task1(ostatok_pokaz)
+        task2_pokaz = task2(ostatok_pokaz)
+        task3_pokaz = task3(ostatok_pokaz, getPokaz)
+        task4_pokaz = task4('pokaz')
+
+        eq = equations(bigtable)
+        line_form = eq[0]
+        parabola_form = eq[1]
+        pokaz_form = eq[2]
+        model = getModelDict(bigtable)
+
+        context = {'line': line,
+                   'bigtable': bigtable,
+                   'line_form': line_form,
+                   "parabola_form": parabola_form,
+                   "pokaz_form": pokaz_form,
+                   "model": model,
+                   "ostatok": ostatok,
+                   "ostatok_line": ostatok_line,
+                   "ostatok_parabola": ostatok_parabola,
+                   "ostatok_pokaz": ostatok_pokaz,
+                   "task1_line": task1_line,
+                   "task2_line": task2_line,
+                   "task3_line": task3_line,
+                   "task4_line": task4_line,
+                   "task1_parabola": task1_parabola,
+                   "task2_parabola": task2_parabola,
+                   "task3_parabola": task3_parabola,
+                   "task4_parabola": task4_parabola,
+                   "task1_pokaz": task1_pokaz,
+                   "task2_pokaz": task2_pokaz,
+                   "task3_pokaz": task3_pokaz,
+                   "task4_pokaz": task4_pokaz,
+                   "test1": result1,
+                   "test2": result2,
+                   'tau': tau,
+                   'tautau': tautau,
+                   "title": title,
                    }
         return render(request, 'game_app/lab9.html', context)

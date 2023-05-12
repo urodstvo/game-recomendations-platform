@@ -20,7 +20,7 @@
         ]);
 
         var options = {
-          title: 'График динамики выхода игр за {{ year }} год',
+          title: '{{ title }}',
           curveType: 'function',
           legend: { position: 'bottom' }
         };
@@ -123,7 +123,7 @@
     </style>
 <main>
     <div>
-        <table class="main">
+        {% comment %}<table class="main">
             <tr>
                 <td>
                     t
@@ -140,7 +140,7 @@
                      <td>{{ value }}</td>
                 {% endfor %}
             </tr>
-        </table> {% comment %} Изначальная выборка {% endcomment %}
+        </table>{% endcomment %} {% comment %} Изначальная выборка {% endcomment %}
         {% comment %} <table class="main">
             <tr>
                 <td>№</td>
@@ -176,7 +176,7 @@
         <div class="grid">
             <div class="line">
                 <h4>Проверка линейной модели</h4>
-                <table class="main">
+                {% comment %}<table class="main">
             <tr>
                 <td>
                     t
@@ -193,9 +193,9 @@
                      <td>{{ value }}</td>
                 {% endfor %}
             </tr>
-        </table> {% comment %} Остаточный ряд {% endcomment %}
+        </table>{% endcomment %} {% comment %} Остаточный ряд {% endcomment %}
                 <h3>Проверка с помощью критерия знаков</h3>
-                <table class="main">
+                {% comment %}<table class="main">
                     <tr>
                         <td>
                             t
@@ -212,7 +212,7 @@
                              <td>{{ value }}</td>
                         {% endfor %}
                     </tr>
-                </table>
+                </table>{% endcomment %}
                 Количество серий = {{ task1_line.n }}
                 <br>
                 Длина самой длинной серии = {{ task1_line.max }}
@@ -318,7 +318,7 @@
             </div>
             <div class="parabola">
                 <h4>Проверка параболической модели</h4>
-                <table class="main">
+                {% comment %}<table class="main">
             <tr>
                 <td>
                     t
@@ -335,9 +335,9 @@
                      <td>{{ value }}</td>
                 {% endfor %}
             </tr>
-        </table> {% comment %} Остаточный ряд {% endcomment %}
+        </table>{% endcomment %} {% comment %} Остаточный ряд {% endcomment %}
                 <h3>Проверка с помощью критерия знаков</h3>
-                <table class="main">
+                {% comment %}<table class="main">
                     <tr>
                         <td>
                             t
@@ -354,7 +354,7 @@
                              <td>{{ value }}</td>
                         {% endfor %}
                     </tr>
-                </table>
+                </table>{% endcomment %}
                 Количество серий = {{ task1_parabola.n }}
                 <br>
                 Длина самой длинной серии = {{ task1_parabola.max }}
@@ -460,7 +460,7 @@
             </div>
             <div class="pokaz">
                 <h4>Проверка показательной модели</h4>
-                <table class="main">
+                {% comment %}<table class="main">
             <tr>
                 <td>
                     t
@@ -477,9 +477,9 @@
                      <td>{{ value }}</td>
                 {% endfor %}
             </tr>
-        </table> {% comment %} Остаточный ряд {% endcomment %}
+        </table> {% endcomment %} {% comment %} Остаточный ряд {% endcomment %}
                 <h3>Проверка с помощью критерия знаков</h3>
-                <table class="main">
+                {% comment %}<table class="main">
                     <tr>
                         <td>
                             t
@@ -496,7 +496,7 @@
                              <td>{{ value }}</td>
                         {% endfor %}
                     </tr>
-                </table>
+                </table> {% endcomment %}
                 Количество серий = {{ task1_pokaz.n }}
                 <br>
                 Длина самой длинной серии = {{ task1_pokaz.max }}

@@ -24,6 +24,8 @@ urlpatterns = [
     path('charts/lab7/', SmoothRyadView.as_view(), name='lab7'),
     path('charts/lab8/', LAB8View.as_view(), name='lab8'),
     path('charts/lab9/', LAB9View.as_view(), name='lab9'),
+    path('charts/lab9/dop/', LAB9dopView.as_view(), name='lab9dop'),
+    path('charts/lab10/', LAB10View.as_view(), name='lab10'),
 
 
 ]

@@ -1,0 +1,297 @@
+{% extends 'game_app/base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load l10n %}
+{% block css %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link type='text/css' rel="stylesheet" href="{% static 'game_app/css/general.css' %}" />
+    <title>LAB10</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+      google.charts.load('current', {'packages':['corechart', "calendar", "orgchart", 'sankey', 'timeline'],});
+      google.charts.setOnLoadCallback(drawArea);
+      google.charts.setOnLoadCallback(drawBubble);
+      google.charts.setOnLoadCallback(drawCalendar);
+      google.charts.setOnLoadCallback(drawStructure);
+      google.charts.setOnLoadCallback(drawSanki);
+      google.charts.setOnLoadCallback(drawChrono);
+
+
+
+      function drawArea() {
+        var data = google.visualization.arrayToDataTable([
+          ['Год', 'Мобильные устройства', 'Консольные устройства', 'Настольные устройства'],
+          {% for key, value in task1.items %} ['{{ key }}', {{ value.0 }}, {{ value.1 }}, {{ value.2 }}], {% endfor %}
+        ]);
+
+        var options = {
+          title: 'Выход игр на разных платформах',
+          hAxis: {title: 'Год',  titleTextStyle: {color: '#333'}},
+          vAxis: {minValue: 0}
+        };
+
+        var chart = new google.visualization.AreaChart(document.getElementById('chart_area'));
+        chart.draw(data, options);
+      }
+
+      function drawBubble() {
+
+      var data = google.visualization.arrayToDataTable([
+        ['ID', 'кол-во отправленных писем', 'кол-во рассылок', 'тема', 'кол-во подписчиков темы'],
+        {% for key, value in task2.items %} ['{{ key }}', {{ value.0 }}, {{ value.1 }}, '{{ value.2 }}', {{ value.3 }}], {% endfor %}
+      ]);
+
+      var options = {
+        title: 'Пузырьковая диаграмма (ось X – кол-во писем, отправленных по теме, ось Y – кол-во рассылок по теме, цвет – тема рассылки, размер пузырька – кол-во подписчиков темы)',
+        hAxis: {title: 'кол-во писем, отправленных по теме'},
+        vAxis: {title: 'кол-во рассылок по теме'},
+        bubble: {textStyle: {fontSize: 11}}
+      };
+
+      var chart = new google.visualization.BubbleChart(document.getElementById('chart_bubble'));
+      chart.draw(data, options);
+    }
+
+    function drawCalendar() {
+       var dataTable = new google.visualization.DataTable();
+       dataTable.addColumn({ type: 'date', id: 'Date' });
+       dataTable.addColumn({ type: 'number', id: 'Won/Loss' });
+       dataTable.addRows([
+          {% for v in task3 %} [new Date({{ v.year }}, {{ v.month }}, {{ v.day }}), {{ v.count }}],
+          {% endfor %}]);
+
+       var chart = new google.visualization.Calendar(document.getElementById('chart_calendar'));
+
+       var options = {
+         title: "Выход игр по дням",
+         height: 500
+       };
+
+       chart.draw(dataTable, options);
+   }
+
+   function drawStructure() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Name');
+        data.addColumn('string', 'Manager');
+        data.addColumn('string', 'ToolTip');
+
+        // For each orgchart box, provide the name, manager, and tooltip to show.
+        data.addRows([
+        {% for v in task4 %}
+          ['{{ v.0 }}', '{{ v.1 }}', ''],
+        {% endfor %}
+        ]);
+
+        // Create the chart.
+        var chart = new google.visualization.OrgChart(document.getElementById('chart_structure'));
+        // Draw the chart, setting the allowHtml option to true for the tooltips.
+        chart.draw(data, {'allowHtml':true});
+      }
+
+      function drawSanki() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'From');
+        data.addColumn('string', 'To');
+        data.addColumn('number', 'Кол-во игр');
+        data.addRows([
+        {% for v in task6 %} ['{{ v.0 }}', '{{ v.1 }}', {{ v.2 }}],
+        {% endfor %} ]);
+
+        // Sets chart options.
+        var options = {
+          title: "Диаграмма Санки (соотнесение групп платформ и популярных жанров)",
+          width: 600,
+        };
+
+        // Instantiates and draws our chart, passing in some options.
+        var chart = new google.visualization.Sankey(document.getElementById('chart_sanki'));
+        chart.draw(data, options);
+      }
+
+      function drawChrono() {
+        var container = document.getElementById('timeline');
+        var chart = new google.visualization.Timeline(container);
+        var dataTable = new google.visualization.DataTable();
+
+        dataTable.addColumn({ type: 'string', id: 'President' });
+        dataTable.addColumn({ type: 'date', id: 'Start' });
+        dataTable.addColumn({ type: 'date', id: 'End' });
+        dataTable.addRows([
+          [ 'Square', new Date(1986, 8, 1), new Date(2003, 3, 1) ],
+          [ 'The 3DO Company',      new Date(1991, 1, 1),  new Date(2003, 1, 1) ],
+          [ 'Visceral Games',  new Date(1998, 1, 1),  new Date(2017, 9, 17) ],
+          [ 'Telltale Games',  new Date(2004, 6, 1),  new Date(2018, 9, 11) ],
+          [ 'Valve',  new Date(1996, 7, 24),  new Date() ],
+          [ 'Ubisoft',  new Date(1986, 2, 28),  new Date() ],
+
+          ]);
+
+        chart.draw(dataTable);
+      }
+    </script>
+
+{% endblock %}
+{% block main %}
+    <style>
+        .google-visualization-orgchart-noderow-medium > td
+        {
+        color: red;
+        }
+        main
+        {
+            color: red;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            flex-direction: column;
+        }
+
+        main div
+        {
+            margin-bottom: 40px;
+        }
+
+        table
+        {
+            width: 100%;
+            text-align: center;
+            border-color: orange;
+        }
+
+        .inner td
+        {
+            width: 50%;
+        }
+
+        td
+        {
+            border: 1px solid orange;
+        }
+
+        td:has( > table)
+        {
+            border: none;
+        }
+
+        .main
+        {
+            border: 1px solid orange;
+            margin: 20px 0;
+            background-color: #222;
+        }
+
+        #map
+        {
+            width: 100%;
+            height: 500px;
+            color: black;
+        }
+
+    </style>
+<main>
+    <div id="chart_area" style="width: 100%; height: 500px;"></div>
+    <div id="chart_bubble" style="width: 100%; height: 500px;"></div>
+    <div id="chart_calendar" style="width: 100%; height: 300px;"></div>
+    <div id="chart_structure" style="width: 100%; height: 500px;"></div>
+    <div style="background-color: white; width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <div style="color: black;">Карты (местоположение крупных комнаний-разработчиков игр);</div>
+        <div id="map"></div>
+        <div style="color: black;">Диаграмма Санки (соотнесение групп платформ и общих популярных жанров)</div>
+        <div id="chart_sanki" style="width: 100%; height: 500px;"></div>
+        <div style="color: black;">Хронология (первая и последняя даты существования популярных компаний-разработчиков игр).</div>
+        <div id="timeline" style="width: 100%; height: 500px;"></div>
+    </div>
+
+
+</main>
+{% endblock %}
+{% block js %}
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=114a9b84-a3e9-4a56-8d9e-aef5623d8d1c"></script>
+    <script>
+ ymaps.ready(init);
+
+function init() {
+    var geolocation = ymaps.geolocation,
+        myMap = new ymaps.Map('map', {
+            center: [55, 34],
+            zoom: -10
+        }, {
+            searchControlProvider: 'yandex#search'
+        });
+
+    // Сравним положение, вычисленное по ip пользователя и
+    // положение, вычисленное средствами браузера.
+    geolocation.get({
+        provider: 'yandex',
+        mapStateAutoApply: true
+    }).then(function (result) {
+        // Красным цветом пометим положение, вычисленное через ip.
+        result.geoObjects.options.set('preset', 'islands#redCircleIcon');
+        result.geoObjects.get(0).properties.set({
+            balloonContentBody: '<div style="color: black;">Мое местоположение'
+        });
+        myMap.geoObjects.add(result.geoObjects)
+        .add(new ymaps.Placemark([37.559371, -122.309102], {
+            balloonContent: '<div style="color: black;">Sony Interactive Entertainment'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([47.669751, -122.122621], {
+            balloonContent: '<div style="color: black;">Microsoft Gaming'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([35.025189, 135.762308], {
+            balloonContent: '<div style="color: black;">Nintendo'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([22.546327, 114.054555], {
+            balloonContent: '<div style="color: black;">Tencent Games'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([34.025149, -118.480501], {
+            balloonContent: '<div style="color: black;">Activision Blizzard'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([37.484874, -122.233042], {
+            balloonContent: '<div style="color: black;">Electronic Arts'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([35.782200, -78.780786], {
+            balloonContent: '<div style="color: black;">Epic Games'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([40.714627, -74.002863], {
+            balloonContent: '<div style="color: black;">Take-Two Interactive'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([48.858583, 2.443166], {
+            balloonContent: '<div style="color: black;">Ubisoft'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([35.681729, 139.753927], {
+            balloonContent: '<div style="color: black;">Bandai Namco Entertainment'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }))
+        .add(new ymaps.Placemark([38.899513, -77.036536], {
+            balloonContent: '<div style="color: black;">Valve'
+        }, {
+            preset: 'islands#blueFactoryCircleIcon'
+        }));
+    });
+
+
+
+}
+    </script>
+{% endblock %}

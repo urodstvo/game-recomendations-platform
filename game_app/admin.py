@@ -19,6 +19,8 @@ class SupportAdmin(admin.ModelAdmin):
     list_filter = ("date", "IsAnswered")
     search_fields = ('user',)
 
+class GenreAdmin(admin.ModelAdmin):
+    list_display = ("pk", 'name')
 
 def set_users(self, request, queryset):
     for obj in queryset:
@@ -62,7 +64,7 @@ class MessageTopicsAdmin(admin.ModelAdmin):
 admin.site.register(Reviews)
 admin.site.register(Profile)
 admin.site.register(Library, SearchLibraryAdmin)
-admin.site.register(Genres)
+admin.site.register(Genres, GenreAdmin)
 admin.site.register(Platforms)
 admin.site.register(Game, SearchGameAdmin)
 admin.site.register(Websites, SearchExtraAdmin)
