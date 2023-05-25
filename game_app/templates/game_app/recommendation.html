@@ -42,7 +42,11 @@
                             {% for user in users %}
                                 <li>
                                     <a href="{% url 'profile' user.username %}">
+                                        {% if user.profile.avatar %}
                                         <img src="{{ user.profile.avatar.url }}">
+                                        {% else %}
+                                        <img src="/">
+                                        {% endif %}
                                         <h3>{{ user.username }}</h3>
                                     </a>
                                 </li>

@@ -55,6 +55,12 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, db_index=True)
     avatar = models.ImageField(upload_to="photos/%Y/%m/%d/", null=True, blank=True)
     nickname = models.CharField(max_length=30, blank=False)
+    country = models.CharField(max_length=60, blank=True)
+    city = models.CharField(max_length=50, blank=True)
+    gender = models.CharField(max_length=30, blank=True)
+    borned_at = models.DateField(blank=True, null=True)
+    main_system = models.CharField(max_length=50, blank=True)
+
 
     def __str__(self):
         return self.nickname

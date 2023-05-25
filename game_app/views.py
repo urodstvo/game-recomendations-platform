@@ -2,11 +2,7 @@ import os
 import random
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
-from typing import Any, Dict
 import locale
-
-locale.setlocale(locale.LC_ALL, "ru_RU")  # russian
-
 import requests
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
@@ -15,28 +11,24 @@ from django.db.models.functions import Lower
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView, CreateView, DetailView
 from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from sklearn.cluster import KMeans
-import time
 from .utils import *
-from .models import *
 from .forms import *
-import multiprocessing
-from fill_db import get_similar
-from rec_func import analyze_comment
+from .fill_db import get_similar, get_actual_popular
+from .rec_func import analyze_comment
 import math
 import pandas as pd
-from django_pandas.io import read_frame
+import numpy as np
 
-from django.core.mail import EmailMultiAlternatives, send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string, get_template
 from django.conf import settings
 
 import pdfkit as pdf
+
+locale.setlocale(locale.LC_ALL, "ru_RU")  # russian
 
 
 def LogOutUser(request):
@@ -492,70 +484,6 @@ class search(ListView):
         return context
 
 
-def create(request):
-    offset = 107655
-    while offset < 230_000:
-        i = 0
-        games = get_game(offset)
-        try:
-            for game in games:
-                print(game["game_id"])
-                i += 1  # 1
-                # for j in game:
-                #     print(j, ' : ', game[j])
-                i += 1  # 2
-                new_game = Game(game_id=game["game_id"], name=game["name"], slug=game["slug"],
-                                developer=game["developer"],
-                                description=game["description"], rating=int(game["rating"]),
-                                rating_count=int(game["rating_count"]))
-                if game["cover"]:
-                    new_game.cover = game["cover"]
-                if game["release_date"]:
-                    new_game.release_date = game["release_date"]
-                new_game.save()
-                i += 1  # 3
-                new_game.genres.set(Genres.objects.filter(name__in=game["genres"]))
-                i += 1  # 4
-                new_game.platforms.set(Platforms.objects.filter(name__in=game["platforms"]))
-                i += 1  # 5
-                new_game.save()
-                i += 1  # 6
-                if len(game["websites"]) > 0:
-                    for el in game["websites"]:
-                        if len(list(Websites.objects.filter(game_id=game["game_id"], name=el,
-                                                            url=game["websites"][el]))) == 0:
-                            Websites(game_id=game["game_id"], name=el, url=game["websites"][el]).save()
-                i += 1  # 7
-                if len(game["release_dates"]) > 0:
-                    for el in game["release_dates"]:
-                        if len(list(ReleaseDates.objects.filter(game_id=game["game_id"], platform=el))) == 0:
-                            rel_date = ReleaseDates(game_id=game["game_id"], platform=el)
-                            if game["release_dates"][el]:
-                                rel_date.date = game["release_dates"][el]
-                            rel_date.save()
-                i += 1  # 8
-                if len(game["video"]) > 0:
-                    for el in game["video"]:
-                        if len(list(Videos.objects.filter(game_id=game["game_id"], video_id=el))) == 0:
-                            Videos(game_id=game["game_id"], video_id=el).save()
-                i += 1  # 9
-                if len(game["images"]) > 0:
-                    for el in game["images"]:
-                        if len(list(Images.objects.filter(game_id=game["game_id"], image_id=el))) == 0:
-                            Images(game_id=game["game_id"], image_id=el).save()
-                i = 0
-                print('end')
-        except:
-            print('error', i)
-            i = 0
-            break
-        else:
-            offset += 500
-
-    context = {}
-    return render(request, 'game_app/bd.html', context=context)
-
-
 class ReviewView(View):
     def post(self, request, slug):
         game = Game.objects.get(slug=slug)
@@ -610,8 +538,6 @@ class RecView(ListView):
 
     @staticmethod
     def distCosine(vecA, vecB):
-        print(vecA)
-
         def dotProduct(vecA, vecB):
             d = 0.0
             for dim in vecA:
@@ -625,13 +551,12 @@ class RecView(ListView):
     @classmethod
     def makeMatches(self, userID, userRates, nBestUsers, nBestProducts):
         matches = [(u, self.distCosine(userRates[userID], userRates[u])) for u in userRates if u != userID]
-        print(userRates)
+        # print(userRates)
         bestMatches = sorted(matches, key=lambda x: x[1], reverse=True)[:nBestUsers]
 
         sim = dict()
         sim_all = sum([x[1] for x in bestMatches])
         bestMatches = dict([x for x in bestMatches if x[1] > 0.0])
-        # print(bestMatches) #users
         for relatedUser in bestMatches:
             for product in userRates[relatedUser]:
                 if product not in userRates[userID]:
@@ -641,8 +566,58 @@ class RecView(ListView):
         for product in sim:
             sim[product] /= sim_all
         bestProducts = sorted(sim.items(), key=lambda x: x[1], reverse=True)[:nBestProducts]  # games
-        # return [(x[0], x[1]) for x in bestProducts]
         return {'games': [x[0] for x in bestProducts], 'users': [x for x in bestMatches]}
+
+    @staticmethod
+    def methodLoktya(x):
+        import matplotlib.pyplot as plt
+        wcss = []
+        for i in range(1, 20):
+            kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=0)
+            kmeans.fit(x)
+            wcss.append(kmeans.inertia_)
+
+        plt.plot(range(1, 20), wcss)
+        plt.title('Метод локтя')
+        plt.xlabel('Количество кластеров')
+        plt.ylabel('SSE')
+        plt.show()
+
+    @classmethod
+    def getSimilarUsers(self, user):
+        import matplotlib.pyplot as plt
+        countries = ['RU']  # , 'USA', 'UK', 'UA', 'KZ', 'KOR', 'JAN', 'CH', 'CA', 'BR', 'FR', 'GER'
+        # ru_cities = ['Moscow', 'Saratov', 'St. Peterburg', 'Omsk', 'Saransk', 'Tomsk', 'Orel', 'Sochi', 'Vladivostok']
+        systems = ['PC', 'Linux', 'Android', 'PS', 'Xbox', 'iOS']
+        users = Profile.objects.filter(~Q(pk=user.pk))
+        x = []
+        for user in users:
+            x.append([0, 1 if user.gender == 'Male' else 0, datetime.now().year - user.borned_at.year, systems.index(user.main_system)])
+        x = np.array(x)
+        kmeans = KMeans(n_clusters=5, init='k-means++', max_iter=300, n_init=10, random_state=0)
+        kmeans.fit(x)
+        # from sklearn.manifold import TSNE
+        # import pandas as pd
+        # clusters = kmeans.labels_
+        # print(len(x))
+        # # применение t-SNE для снижения размерности до 2 компонент
+        # tsne = TSNE(n_components=2)
+        # X_tsne = tsne.fit_transform(x)
+        #
+        # # визуализация
+        # plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=clusters, cmap='rainbow')
+        # plt.show()
+
+        profile = Profile.objects.get(pk=user.pk)
+        user_label = kmeans.predict([[0, 1 if profile.gender == 'Male' else 0,
+                                      datetime.now().year - profile.borned_at.year,
+                                      systems.index(profile.main_system)]])
+        # Получаем данные о пользователях
+        similar_users = []
+        for ind, label in enumerate(kmeans.labels_):
+            if label == user_label:
+                similar_users.append(users[ind])
+        return similar_users
 
     @classmethod
     def makeRecommendations(self, matches):
@@ -671,18 +646,31 @@ class RecView(ListView):
         return Library.objects.all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        # self.getSimilarUsers(self.request.user)
         context = super().get_context_data(**kwargs)
-        games = self.request.session.get('games', 0)
-        if not games:
-            recs = self.makeRecommendations(
-                self.makeMatches(self.request.user, self.get_format_dict(self.object_list), 20, 20))
-            context['games'] = Game.objects.filter(game_id__in=recs["games"])
-            context['users'] = User.objects.filter(username__in=recs["users"])
-            self.request.session['games'] = [i.pk for i in context['games']]
-            self.request.session['users'] = [i.pk for i in context['users']]
-        else:
-            context['games'] = Game.objects.filter(pk__in=self.request.session['games'])
-            context['users'] = User.objects.filter(pk__in=self.request.session['users'])
+        actual = list(Game.objects.filter(name__in=get_actual_popular()))
+        try:
+            recs = self.makeRecommendations(self.makeMatches(self.request.user, self.get_format_dict(self.object_list), 20, 20))
+            games = recs['games']
+            users = recs['users']
+            games = Game.objects.filter(game_id__in=games)
+            users = User.objects.filter(username__in=users)
+        except:
+            users = self.getSimilarUsers(self.request.user)
+            games = []
+            for user in users:
+                library = Library.objects.filter(user=user.pk)
+                for game in library:
+                    games.append(game.game)
+            users = [profile.user for profile in users]
+        finally:
+            l = list(games) + actual
+            games = set([])
+            while len(games) < 8:
+                games.add(l[random.randint(0, len(l) - 1)])
+            # print(games)
+            context['games'] = games
+            context['users'] = users
 
         # text = '''<p><span>РЕКОМЕНДОВАНЫЕ ИГРЫ</span>, СОСТАВЛЕННЫЕ ПО ВАШЕЙ ЛИЧНОЙ БИБЛИОТЕКЕ ИГР.</p>
         #             <p>В РАСЧЁТЕ УЧАВСТВОВАЛИ <span>ПОЛЬЗОВАТЕЛИ</span>, С КОТОРЫМИ У ВАС СХОЖИ ИНТЕРЕСЫ.</p>
@@ -859,18 +847,20 @@ class RyadView(View):
 
 
 def CreateUser(request):
-    num = random.randint(0, 100)
-    for _ in range(0, 16):
-        try:
-            library = Library.objects.create(user=User.objects.get(pk=random.randint(0, 100)),
-                                             game=Game.objects.get(pk=random.randint(0, 40456)))
-            month = random.randint(6, 16)
-            d = date(2022, month, 1) if month < 13 else date(2023, month - 12, 1)
-            library.added_at = d
-        except:
-            pass
-        else:
-            library.save()
+    countries = ['RU']  # , 'USA', 'UK', 'UA', 'KZ', 'KOR', 'JAN', 'CH', 'CA', 'BR', 'FR', 'GER'
+    ru_cities = ['Moscow', 'Saratov', 'St. Peterburg', 'Omsk', 'Saransk', 'Tomsk', 'Orel', 'Sochi', 'Vladivostok']
+    systems = ['PC', 'Linux', 'Android', 'PS', 'Xbox', 'iOS']
+    for profile in Profile.objects.all():
+        year = random.randint(1995, 2005)
+        month = random.randint(1, 12)
+        day = random.randint(1, 28)
+        profile.country = 'RU'
+        profile.city = ru_cities[random.randint(0, len(ru_cities) - 1)]
+        profile.gender = 'Male' if random.randint(1, 100) <= 80 else 'Female'
+        profile.main_system = systems[random.randint(0, len(systems) - 1)]
+        profile.borned_at = date(year, month, day)
+        profile.save()
+        print(profile)
     return HttpResponse(f'added ')
 
 
@@ -1733,6 +1723,7 @@ class LAB10View(View):
                 start += relativedelta(days=1)
 
             return result
+
         def Task4():
             result = [['Популярные жанры', '', '']]
             genres = [4, 24, 30, 33, 51]
@@ -1769,16 +1760,18 @@ class LAB10View(View):
                    }
         return render(request, 'game_app/lab10.html', context)
 
+
 class LAB9dopView(View):
     def get(self, request):
-        n = 12*20
+        n = 12 * 20
+
         def viborka():
             n = 12 * 20
             line = {}
             year = request.GET.get('year', (datetime.now() - relativedelta(years=1)).year)
             # start = date(int(year), 1, 1)
             start = date(2000, 1, 1)
-            for m in range(1, n+1):
+            for m in range(1, n + 1):
                 line[m] = len(list(Game.objects.filter(release_date__lt=start + relativedelta(months=1),
                                                        release_date__gte=start)))
                 start += relativedelta(months=1)
@@ -1786,7 +1779,7 @@ class LAB9dopView(View):
             return [line, title]
 
         def bigtable(arr):
-            n = 12*20
+            n = 12 * 20
             total_y = 0
             total_t = 0
             total_yt = 0
@@ -1797,7 +1790,7 @@ class LAB9dopView(View):
             total_lnyt = 0
 
             bigtable = {}
-            for m in range(1, n+1):
+            for m in range(1, n + 1):
                 y = arr[m]
                 t = m - 6
                 yt = y * t
@@ -1821,14 +1814,14 @@ class LAB9dopView(View):
             return bigtable
 
         def values(arr):
-            n = 12*20
+            n = 12 * 20
             ind = 1
             max = 1
             nn = 0
             for m in range(2, n):
-                if arr[m] != arr[m - 1] or m == n-1:
+                if arr[m] != arr[m - 1] or m == n - 1:
                     nn += 1
-                    if arr[m] != arr[m - 1] and m == n-1:
+                    if arr[m] != arr[m - 1] and m == n - 1:
                         nn += 1
                     if m - ind > max:
                         max = m - ind
@@ -1836,7 +1829,7 @@ class LAB9dopView(View):
             return [nn, max]
 
         def coefs(type, arr):
-            n = 12*20
+            n = 12 * 20
             l0 = arr['Всего'][0] / n
             l1 = arr['Всего'][2] / arr['Всего'][3]
 
@@ -1875,13 +1868,13 @@ class LAB9dopView(View):
             return [line, parabola, pokaz]
 
         def getModelDict(arr):
-            n = 12*20
+            n = 12 * 20
             line_arr = modelArr('line', arr)
             parabola_arr = modelArr('parabola', arr)
             pokaz_arr = modelArr('pokaz', arr)
 
             d = {}
-            for m in range(1, n+1):
+            for m in range(1, n + 1):
                 d[m] = []
                 d[m].append(line[m])
                 d[m].append(line_arr[m - 1])
@@ -1891,10 +1884,10 @@ class LAB9dopView(View):
             return d
 
         def findMe(arr):
-            n = 12*20
-            arr = [arr[m] for m in range(1, n+1)]
+            n = 12 * 20
+            arr = [arr[m] for m in range(1, n + 1)]
             arr = sorted(arr)
-            return (arr[round(n/2)] + arr[round(n/2+1)]) / 2
+            return (arr[round(n / 2)] + arr[round(n / 2 + 1)]) / 2
 
         def getLine(t):
             c = coefs('line', bigtable)
@@ -1909,14 +1902,14 @@ class LAB9dopView(View):
             return round(c[0] + c[1] ** t, 2)
 
         def ostatok(arr, func):
-            n = 12*20
+            n = 12 * 20
             ostatok = {}
-            for m in range(1, n+1):
+            for m in range(1, n + 1):
                 ostatok[m] = round(arr[m] - func(m - 6), 2)
             return ostatok
 
         def task1(arr):  # arr - ostatok ryad
-            n = 12*20
+            n = 12 * 20
             table_me = {}
             me = findMe(arr)
             for m in range(1, n):
@@ -1931,9 +1924,9 @@ class LAB9dopView(View):
             sum_2 = 0
             sum_3 = 0
             sum_4 = 0
-            n = 12*20
+            n = 12 * 20
 
-            for m in range(1, n+1):
+            for m in range(1, n + 1):
                 sum_2 = arr[m] ** 2
                 sum_3 = arr[m] ** 3
                 sum_4 = arr[m] ** 4
@@ -1957,15 +1950,15 @@ class LAB9dopView(View):
                     "result": result1}
 
         def task3(arr, func):
-            n = 12*20
+            n = 12 * 20
             table = {}
             e_2_total = 0
             e_diff_total = 0
-            for m in range(1, n+1):
+            for m in range(1, n + 1):
                 table[m] = [line[m], m - 6, func(m - 6), arr[m], round(arr[m] ** 2, 2)]
                 e_2_total += arr[m] ** 2
             table[1].append('-')
-            for m in range(2, n+1):
+            for m in range(2, n + 1):
                 table[m].append(round((table[m][-2] - table[m - 1][-3]) ** 2, 2))
                 e_diff_total += table[m][-1]
 
@@ -1979,16 +1972,16 @@ class LAB9dopView(View):
                     'check': check, "d1": d1, 'du': du, 'd': d}
 
         def task4(model):
-            n = 12*20
+            n = 12 * 20
             arr = modelArr(model, bigtable)
             sum = 0
-            for m in range(1, n+1):
+            for m in range(1, n + 1):
                 sum += abs((arr[m - 1] - line[m]) / line[m]) if line[m] > 0 else abs((arr[m - 1] - line[m]) / 1)
 
             MAPE = round(100 * (sum / n), 2)
             S = round(math.sqrt(sum / n), 2)
             SSE = round(sum, 2)
-            MSE = round(SSE / n-2, 2)
+            MSE = round(SSE / n - 2, 2)
 
             if MAPE < 10:
                 result = 'Так как MAPE < 10%, модель имеет высокую точность'

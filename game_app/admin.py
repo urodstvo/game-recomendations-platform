@@ -7,7 +7,8 @@ class SearchGameAdmin(admin.ModelAdmin):
 
 
 class SearchLibraryAdmin(admin.ModelAdmin):
-    list_filter = ("user",)
+    list_display = ("user", 'game', 'rate')
+    list_filter = ("user", 'rate')
 
 
 class SearchExtraAdmin(admin.ModelAdmin):
