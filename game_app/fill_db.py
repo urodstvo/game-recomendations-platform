@@ -42,7 +42,7 @@ def init_token():
 def post_req(obj: str, req: str, headers=init_token()):
     url = 'https://api.igdb.com/v4/'
     request = post(url + obj, headers=headers, data=req).json()
-
+    print(request)
     return request
 
 

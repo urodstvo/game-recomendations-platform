@@ -95,12 +95,21 @@ class ProfileView(DetailView):
     slug_url_kwarg = 'username'
 
     def post(self, request, username):
-        profile_bd = Profile.objects.get(user=request.user)
-        profile = ProfileForm(self.request.POST, request.FILES, instance=request.user.profile,
-                              initial={'nickname': profile_bd.nickname, 'avatar': profile_bd.avatar})
-        if profile.is_valid():
-            profile.save()
-        return redirect('profile', username)
+        profile = Profile.objects.get(user=request.user.pk)
+
+        country = request.POST.get('country', '')
+        gender = request.POST.get('gender', '')
+        age = int(request.POST.get('age', 0))
+        device = request.POST.get('device', '')
+
+        if country: profile.country = country
+        if gender: profile.gender = gender
+        if age: profile.borned_at = datetime.now() - relativedelta(years=age)
+        if device: profile.main_system = device
+
+        profile.save()
+
+        return redirect('profile', request.user.username)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -154,6 +163,12 @@ class ProfileView(DetailView):
         # t = render_to_string(self.template_name, context)
         # pdf.from_string(t, '../media/profile.pdf', css=css)
         # pdf.from_url('http://127.0.0.1:8000/profile/admin/', '../media/profile.pdf')
+
+        context['country'] = context['profile'].country if context['profile'].country else ''
+        context['gender'] = context['profile'].gender if context['profile'].gender else ''
+        context['age'] = datetime.now().year - context['profile'].borned_at.year if context['profile'].borned_at else ''
+        context['device'] = context['profile'].main_system if context['profile'].main_system else ''
+
 
         return context
 
@@ -573,7 +588,7 @@ class RecView(ListView):
         import matplotlib.pyplot as plt
         wcss = []
         for i in range(1, 20):
-            kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=0)
+            kmeans = KMeans(n_clusters=i, init='k-means++')
             kmeans.fit(x)
             wcss.append(kmeans.inertia_)
 
@@ -591,10 +606,12 @@ class RecView(ListView):
         systems = ['PC', 'Linux', 'Android', 'PS', 'Xbox', 'iOS']
         users = Profile.objects.filter(~Q(pk=user.pk))
         x = []
+        # print(users)
         for user in users:
             x.append([0, 1 if user.gender == 'Male' else 0, datetime.now().year - user.borned_at.year, systems.index(user.main_system)])
         x = np.array(x)
-        kmeans = KMeans(n_clusters=5, init='k-means++', max_iter=300, n_init=10, random_state=0)
+        # print(x)
+        kmeans = KMeans(n_clusters=5, init='k-means++')
         kmeans.fit(x)
         # from sklearn.manifold import TSNE
         # import pandas as pd

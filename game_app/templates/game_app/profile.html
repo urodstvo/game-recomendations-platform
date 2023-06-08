@@ -150,8 +150,11 @@
                     <h2>Настройки профиля</h2>
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <label>Аватар:</label><input type="file" name="avatar" accept="image/*" class="avatar" id="id_avatar">
-                        <label>Имя пользователя:</label><input type="text" name="nickname" maxlength="30" minlength="4" class="nickname" id="id_nickname">
+                        <label>Страна:</label><input type="text" name="country" value="{{ country }}">
+                        <label>Пол:</label><input type="text" name="gender" value="{{ gender }}">
+                        <label>Возраст:</label><input type="number" min="1" max="110" name="age" value="{{ age }}">
+                        <label>Девайс:</label><input type="text" name="device" value="{{ device }}">
+
                         <button>Подтвердить</button>
                     </form>
                 </div>
